@@ -1,5 +1,8 @@
 package io.block;
 
+import io.block.responses.BalanceInfo;
+import io.block.responses.NewAddressInfo;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -21,10 +24,10 @@ public class BlockIO {
 		this.apiKey = apiKey;
 	}
 
-	protected APIResponse apiCall( String method, Map< String, String > parameters ) throws Exception {
+	protected < T extends APIResponse > T apiCall( T apiResponse, Map< String, String > parameters ) throws Exception {
 
 		CloseableHttpClient client = HttpClients.createDefault( );
-		HttpGet get = new HttpGet( "https://block.io/api/v1/" + method + "/" );
+		HttpGet get = new HttpGet( "https://block.io/api/v1/" + apiResponse.getMethodName( ) + "/" );
 
 		if ( parameters == null ) {
 			parameters = new HashMap< String, String >( );
@@ -42,58 +45,43 @@ public class BlockIO {
 
 		CloseableHttpResponse response = client.execute( get );
 
+		int httpStatus = response.getStatusLine( ).getStatusCode( );
+
+		String responseText = EntityUtils.toString( response.getEntity( ) );
+
+		if ( httpStatus == 500 ) {
+			throw new Exception( "[API ERROR] HTTP Error " + httpStatus + " Message:" + responseText );
+		}
+
 		Gson gson = new Gson( );
-		String jsonText = EntityUtils.toString( response.getEntity( ) );
-		APIResponse apiResponse = gson.fromJson( jsonText, APIResponse.class );
+		try {
+			apiResponse = ( T ) gson.fromJson( responseText, apiResponse.getClass( ) );
+		} catch ( Exception e ) {
+			e.printStackTrace( );
+			throw e;
+		}
 
 		response.close( );
 
-		if ( apiResponse.status.equals( "success" ) ) {
-
-			if ( apiResponse.data.containsKey( "user_id" ) ) {
-				// Convert user_id from double to integer
-				apiResponse.data.put( "user_id", ( ( Double ) apiResponse.data.get( "user_id" ) ).intValue( ) );
-			}
-
-		} else {
-
-			throw new Exception( "Block.io API Error: " + apiResponse.data.get( "error_message" ) );
-
-		}
-
-		return apiResponse;
+		return ( T ) apiResponse;
 
 	}
 
-	public APIResponse getNewAddress( String label ) throws Exception {
+	public BalanceInfo getBalance( ) throws Exception {
 
-		Map< String, String > params = new HashMap< String, String >( );
-		if ( label != null ) {
-			params.put( "label", label );
-		}
-
-		return apiCall( "get_new_address", params );
+		return apiCall( new BalanceInfo( ), null );
 
 	}
 
-	public APIResponse getBalance( ) throws Exception {
+	public NewAddressInfo getNewAddress( ) throws Exception {
 
-		return apiCall( "get_balance", null );
+		return getNewAddress( null );
 
 	}
 
-	public APIResponse getAddressReceived( Map< String, String > addressOrLabel ) throws Exception {
+	public NewAddressInfo getNewAddress( Map< String, String > parameters ) throws Exception {
 
-		Map< String, String > params = new HashMap< String, String >( );
-		if ( addressOrLabel.containsKey( "address" ) ) {
-			params.put( "address", addressOrLabel.get( "address" ) );
-		} else if ( addressOrLabel.containsKey( "label" ) ) {
-			params.put( "label", addressOrLabel.get( "label" ) );
-		} else {
-			throw new Exception( "Missing value for key: address or label" );
-		}
-
-		return apiCall( "get_address_received", params );
+		return apiCall( new NewAddressInfo( ), parameters );
 
 	}
 
