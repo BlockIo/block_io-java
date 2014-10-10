@@ -1,5 +1,6 @@
 package io.block;
 
+import java.math.BigDecimal;
 import java.util.Map;
 
 public abstract class APIResponse {
@@ -11,12 +12,8 @@ public abstract class APIResponse {
 		return data.get( name ).toString( );
 	}
 
-	protected Float _getFloat( String name ) {
-		return new Float( data.get( name ).toString( ) );
-	}
-
-	protected Integer _getInteger( String name ) {
-		return new Integer( data.get( name ).toString( ) );
+	protected BigDecimal _getNumber( String name ) {
+		return new BigDecimal( data.get( name ).toString( ) );
 	}
 
 	public abstract String getMethodName( );

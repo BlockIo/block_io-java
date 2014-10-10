@@ -1,5 +1,7 @@
 package io.block.responses;
 
+import java.math.BigDecimal;
+
 import io.block.APIResponse;
 
 public class BalanceInfo extends APIResponse {
@@ -9,12 +11,12 @@ public class BalanceInfo extends APIResponse {
 		return "get_balance";
 	}
 
-	public Float getAvailableBalance( ) {
-		return _getFloat( "available_balance" );
+	public BigDecimal getAvailableBalance( ) {
+		return _getNumber( "available_balance" );
 	}
 
-	public Float getPendingReceivedBalance( ) {
-		return _getFloat( "pending_received_balance" );
+	public BigDecimal getPendingReceivedBalance( ) {
+		return _getNumber( "pending_received_balance" );
 	}
 
 }
