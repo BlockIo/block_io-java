@@ -1,7 +1,9 @@
 package io.block;
 
 import io.block.responses.BalanceInfo;
+import io.block.responses.MyAddressesInfo;
 import io.block.responses.NewAddressInfo;
+import io.block.responses.TransactionsInfo;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -27,7 +29,7 @@ public class BlockIO {
 	protected < T extends APIResponse > T apiCall( T apiResponse, Map< String, String > parameters ) throws Exception {
 
 		CloseableHttpClient client = HttpClients.createDefault( );
-		HttpGet get = new HttpGet( "https://block.io/api/v1/" + apiResponse.getMethodName( ) + "/" );
+		HttpGet get = new HttpGet( "https://block.io/api/v2/" + apiResponse.getMethodName( ) + "/" );
 
 		if ( parameters == null ) {
 			parameters = new HashMap< String, String >( );
@@ -52,6 +54,9 @@ public class BlockIO {
 		if ( httpStatus == 500 ) {
 			throw new Exception( "[API ERROR] HTTP Error " + httpStatus + " Message:" + responseText );
 		}
+		if ( httpStatus == 404 ) {
+			throw new Exception( "[API ERROR] API Error " + httpStatus + " Message:" + responseText );
+		}
 
 		Gson gson = new Gson( );
 		try {
@@ -73,6 +78,10 @@ public class BlockIO {
 
 	}
 
+	public MyAddressesInfo getMyAddresses( ) throws Exception {
+		return apiCall( new MyAddressesInfo( ), null );
+	}
+
 	public NewAddressInfo getNewAddress( ) throws Exception {
 
 		return getNewAddress( null );
@@ -83,6 +92,15 @@ public class BlockIO {
 
 		return apiCall( new NewAddressInfo( ), parameters );
 
+	}
+
+	public TransactionsInfo getTransactions( ) throws Exception {
+		return getTransactions( null );
+	}
+
+	public TransactionsInfo getTransactions( Map< String, String > parameters ) throws Exception {
+
+		return apiCall( new TransactionsInfo( ), parameters );
 	}
 
 }

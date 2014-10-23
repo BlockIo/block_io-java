@@ -16,6 +16,10 @@ public abstract class APIResponse {
 		return new BigDecimal( data.get( name ).toString( ) );
 	}
 
+	protected Integer _getInteger( String name ) {
+		return new Integer( data.get( name ).toString( ) );
+	}
+
 	public abstract String getMethodName( );
 
 	public String getStatus( ) {
