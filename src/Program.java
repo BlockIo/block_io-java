@@ -15,7 +15,7 @@ public class Program {
         System.out.println("Private Key from deadbeef: " + testKey.getPrivateKeyAsHex());
         System.out.println("Public Key from deadbeef: " + testKey.getPublicKeyAsHex());
         System.out.println("Signed Data: " + SignInputs(testKey, dataToSign));
-        //test commit 4
+        //test commit 5
     }
 
     public static String SignInputs(ECKey k, String dataToSign){
