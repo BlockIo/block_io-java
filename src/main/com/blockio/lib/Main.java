@@ -1,3 +1,5 @@
+package com.blockio.lib;
+
 import org.bitcoinj.core.ECKey;
 import org.bitcoinj.core.Sha256Hash;
 import org.bitcoinj.core.Utils;
@@ -5,7 +7,7 @@ import org.bouncycastle.util.encoders.Base64;
 
 import java.nio.charset.StandardCharsets;
 
-public class Program {
+public class Main {
     public static void main(String[] args) {
         System.out.println("Hello World");
 
@@ -26,3 +28,4 @@ public class Program {
 
     }
 }
+
