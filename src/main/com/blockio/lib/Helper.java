@@ -1,5 +1,8 @@
 package com.blockio.lib;
 
+import org.bitcoinj.core.ECKey;
+import org.bitcoinj.core.Sha256Hash;
+import org.bitcoinj.core.Utils;
 import org.bouncycastle.crypto.digests.SHA256Digest;
 import org.bouncycastle.crypto.generators.PKCS5S2ParametersGenerator;
 import org.bouncycastle.crypto.params.KeyParameter;
@@ -67,6 +70,18 @@ public class Helper {
         catch (Exception e)
         {
             System.out.println("Error while decrypting: " + e.toString());
+        }
+        return null;
+    }
+
+    public static String signInputs(ECKey k, String dataToSign, String pubKeyToVerify){
+
+        String pubKey = k.getPublicKeyAsHex();
+        if(pubKey.equals(pubKeyToVerify)){
+            Sha256Hash hashedDataToSign = Sha256Hash.wrap(Utils.HEX.decode(dataToSign));
+            ECKey.ECDSASignature sig = k.sign(hashedDataToSign);
+            byte[] byteSignedData = sig.encodeToDER();
+            return Utils.HEX.encode(byteSignedData);
         }
         return null;
     }
