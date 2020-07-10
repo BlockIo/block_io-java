@@ -18,9 +18,6 @@ import java.util.Base64;
 
 public class Helper {
 
-    private static SecretKeySpec secretKey;
-    private static byte[] key;
-
     public static String pinToAesKey(String pin) throws NoSuchAlgorithmException, InvalidKeySpecException {
         SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
         char[] pinChars = pin.toCharArray();
@@ -58,29 +55,17 @@ public class Helper {
     {
         try
         {
-            setKey(secret);
-            Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5PADDING");
-            cipher.init(Cipher.DECRYPT_MODE, secretKey);
-            return new String(cipher.doFinal(Base64.getDecoder().decode(strToDecrypt)));
+            byte[] key = Base64.getDecoder().decode(secret);
+            byte[] keyArrBytes32Value = Arrays.copyOf(key, 32);
+            Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
+            SecretKeySpec secretKeySpec = new SecretKeySpec(keyArrBytes32Value, "AES");
+            cipher.init(Cipher.DECRYPT_MODE, secretKeySpec);
+            return new String(cipher.doFinal(Base64.getDecoder().decode(strToDecrypt)), StandardCharsets.UTF_8);
         }
         catch (Exception e)
         {
             System.out.println("Error while decrypting: " + e.toString());
         }
         return null;
-    }
-    public static void setKey(String myKey)
-    {
-        MessageDigest sha = null;
-        try {
-            key = myKey.getBytes(StandardCharsets.UTF_8);
-            sha = MessageDigest.getInstance("SHA-1");
-            key = sha.digest(key);
-            key = Arrays.copyOf(key, 16);
-            secretKey = new SecretKeySpec(key, "AES");
-        }
-        catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        }
     }
 }

@@ -11,7 +11,9 @@ import java.security.spec.InvalidKeySpecException;
 public class Main {
     public static void main(String[] args) throws InvalidKeySpecException, NoSuchAlgorithmException {
         System.out.println("PIN TO AES TEST: " + Helper.pinToAesKey("123456"));
-        System.out.println("Encrypt with key: " + Helper.encrypt("blockIo", Helper.pinToAesKey("123456")));
+        String encrypted = Helper.encrypt("blockIo", Helper.pinToAesKey("123456"));
+        System.out.println("Encrypt with key: " + encrypted);
+        System.out.println("Decrypt with key: " + Helper.decrypt(encrypted, Helper.pinToAesKey("123456")));
 //        System.out.println("Encrypted data: " + Helper.encrypt("I'm a little tea pot short and stout", ));
 //
 //        byte[] hashedData = Sha256Hash.hash(Utils.HEX.decode("deadbeef"));
