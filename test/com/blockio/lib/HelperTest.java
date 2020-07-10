@@ -1,4 +1,5 @@
-import com.blockio.lib.Helper;
+package com.blockio.lib;
+
 import org.bouncycastle.util.encoders.Hex;
 import org.junit.jupiter.api.Test;
 import java.io.UnsupportedEncodingException;
