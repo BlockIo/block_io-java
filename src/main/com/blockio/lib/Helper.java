@@ -18,10 +18,9 @@ import java.util.Base64;
 
 public class Helper {
 
-    public static byte[] sha256Hash(String hexStr) throws NoSuchAlgorithmException {
-        byte[] value = Hex.decode(hexStr);
+    public static byte[] sha256Hash(byte[] toHash) throws NoSuchAlgorithmException {
         MessageDigest digest = MessageDigest.getInstance("SHA-256");
-        byte[] hash = digest.digest(value);
+        byte[] hash = digest.digest(toHash);
         return hash;
     }
 

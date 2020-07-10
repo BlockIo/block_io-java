@@ -30,7 +30,7 @@ class HelperTest {
     @Test
     void sha256Hash() throws NoSuchAlgorithmException {
         String testData = "deadbeef";
-        String shaData = Hex.toHexString(Helper.sha256Hash(testData));
+        String shaData = Hex.toHexString(Helper.sha256Hash(Hex.decode(testData)));
         assertEquals(controlHashedData, shaData);
     }
 }
