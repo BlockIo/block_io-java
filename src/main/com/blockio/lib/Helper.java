@@ -4,11 +4,13 @@ import org.bouncycastle.util.encoders.Hex;
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.spec.AlgorithmParameterSpec;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
 import java.util.Arrays;
@@ -39,16 +41,15 @@ public class Helper {
     }
     public static String encrypt(String strToEncrypt, String secret)
     {
-        try
-        {
-            setKey(secret);
+        try {
+            byte[] key = Base64.getDecoder().decode(secret);
+            byte[] keyArrBytes32Value = Arrays.copyOf(key, 32);
             Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
-            cipher.init(Cipher.ENCRYPT_MODE, secretKey);
-            return Base64.getEncoder().encodeToString(cipher.doFinal(strToEncrypt.getBytes("UTF-8")));
-        }
-        catch (Exception e)
-        {
-            System.out.println("Error while encrypting: " + e.toString());
+            SecretKeySpec secretKeySpec = new SecretKeySpec(keyArrBytes32Value, "AES");
+            cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec);
+            return Base64.getEncoder().encodeToString(cipher.doFinal(strToEncrypt.getBytes(StandardCharsets.UTF_8)));
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return null;
     }
