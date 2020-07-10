@@ -3,10 +3,7 @@ package com.blockio.lib;
 import org.bitcoinj.core.ECKey;
 import org.bitcoinj.core.Sha256Hash;
 import org.bitcoinj.core.Utils;
-
 import java.io.UnsupportedEncodingException;
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
 
 public class Main {
     public static void main(String[] args) throws UnsupportedEncodingException {
