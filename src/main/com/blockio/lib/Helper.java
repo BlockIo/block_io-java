@@ -1,39 +1,32 @@
 package com.blockio.lib;
+import org.bouncycastle.crypto.digests.SHA256Digest;
+import org.bouncycastle.crypto.generators.PKCS5S2ParametersGenerator;
+import org.bouncycastle.crypto.params.KeyParameter;
 import org.bouncycastle.util.encoders.Hex;
 
 import javax.crypto.Cipher;
-import javax.crypto.SecretKey;
-import javax.crypto.SecretKeyFactory;
-import javax.crypto.spec.IvParameterSpec;
-import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
+import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.AlgorithmParameterSpec;
-import java.security.spec.InvalidKeySpecException;
-import java.security.spec.KeySpec;
 import java.util.Arrays;
 import java.util.Base64;
 
 public class Helper {
 
-    public static String pinToAesKey(String pin) throws NoSuchAlgorithmException, InvalidKeySpecException {
-        SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
-        char[] pinChars = pin.toCharArray();
+    public static String pinToAesKey(String pin) throws UnsupportedEncodingException {
 
-        //first round
-        KeySpec spec = new PBEKeySpec(pinChars, new byte[1], 1024, 128);
-        SecretKey key = factory.generateSecret(spec);
-        byte[] secret = new SecretKeySpec(key.getEncoded(), "AES").getEncoded();
+        PKCS5S2ParametersGenerator gen = new PKCS5S2ParametersGenerator(new SHA256Digest());
 
-        //second round
-        String hexStr = Hex.toHexString(secret).toLowerCase();
-        spec = new PBEKeySpec(hexStr.toCharArray(), new byte[1], 1024, 256);
-        key = factory.generateSecret(spec);
-        secret = new SecretKeySpec(key.getEncoded(), "AES").getEncoded();
+        //round 1
+        gen.init(pin.getBytes("UTF-8"), new byte[0], 1024);
+        byte[] dk = ((KeyParameter) gen.generateDerivedParameters(128)).getKey();
 
-        return Base64.getEncoder().encodeToString(secret);
+        //round 2
+        String hexStr = Hex.toHexString(dk).toLowerCase();
+        gen.init(hexStr.getBytes(), new byte[0], 1024);
+        dk = ((KeyParameter) gen.generateDerivedParameters(256)).getKey();
+
+        return Base64.getEncoder().encodeToString(dk);
 
     }
     public static String encrypt(String strToEncrypt, String secret)

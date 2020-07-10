@@ -9,7 +9,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 
 public class Main {
-    public static void main(String[] args) throws InvalidKeySpecException, NoSuchAlgorithmException {
+    public static void main(String[] args) throws UnsupportedEncodingException {
         System.out.println("PIN TO AES TEST: " + Helper.pinToAesKey("123456"));
         String encrypted = Helper.encrypt("blockIo", Helper.pinToAesKey("123456"));
         System.out.println("Encrypt with key: " + encrypted);
