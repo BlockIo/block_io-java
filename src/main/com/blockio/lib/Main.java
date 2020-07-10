@@ -3,14 +3,14 @@ package com.blockio.lib;
 import org.bitcoinj.core.ECKey;
 import org.bitcoinj.core.Sha256Hash;
 import org.bitcoinj.core.Utils;
+import org.bouncycastle.util.encoders.Hex;
+
 import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
 
 public class Main {
-    public static void main(String[] args) throws UnsupportedEncodingException {
-        System.out.println("PIN TO AES TEST: " + Helper.pinToAesKey("123456"));
-        String encrypted = Helper.encrypt("blockIo", Helper.pinToAesKey("123456"));
-        System.out.println("Encrypt with key: " + encrypted);
-        System.out.println("Decrypt with key: " + Helper.decrypt(encrypted, Helper.pinToAesKey("123456")));
+    public static void main(String[] args) throws NoSuchAlgorithmException {
+        System.out.println("Sha256: " + Hex.toHexString(Helper.sha256Hash("deadbeef")));
 //        System.out.println("Encrypted data: " + Helper.encrypt("I'm a little tea pot short and stout", ));
 //
 //        byte[] hashedData = Sha256Hash.hash(Utils.HEX.decode("deadbeef"));

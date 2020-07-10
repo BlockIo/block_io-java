@@ -8,10 +8,19 @@ import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.Base64;
 
 public class Helper {
+
+    public static byte[] sha256Hash(String hexStr) throws NoSuchAlgorithmException {
+        byte[] value = Hex.decode(hexStr);
+        MessageDigest digest = MessageDigest.getInstance("SHA-256");
+        byte[] hash = digest.digest(value);
+        return hash;
+    }
 
     public static String pinToAesKey(String pin) throws UnsupportedEncodingException {
 
