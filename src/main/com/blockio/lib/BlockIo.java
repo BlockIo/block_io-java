@@ -8,9 +8,7 @@ import org.bitcoinj.core.ECKey;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Method;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Map;
 
 import static com.blockio.lib.JsonUtils.isJson;
@@ -147,7 +145,7 @@ public class BlockIo {
         }
         for(Input input : pojo.getInputs()){
             for(Signer signer : input.getSigners()){
-                signer.setSignedData(Helper.signInputs(keyFromWif, input.getDataToSign(), pojo.getEncryptedPassphrase().getSignerPublicKey()));
+                signer.setSignedData(Helper.signInputs(keyFromWif, input.getDataToSign(), signer.getSignerPublicKey()));
             }
         }
         keyFromWif = null;

@@ -17,9 +17,12 @@ import static com.blockio.lib.JsonUtils.getMapFromObj;
 
 public class Main {
     public static void main(String[] args) throws Exception {
-        JsonObject withdrawObj = new JsonObject();
-        withdrawObj.addProperty("amounts", "0.002");
-        withdrawObj.addProperty("to_addresses", "2N8pEWg9ZPyxa2yioZWDYAzNFyTnYp6TkHF");
+        JsonObject sweepObj = new JsonObject();
+        sweepObj.addProperty("to_address", "my9gXk65EzZUL962MSJadPXJFmJzPDc1WT");
+        sweepObj.addProperty("private_key", "cUhedoiwPkprm99qfUKzixsrpN3w6wT2XrrMjqo3Yh1tHz8ykVKc");
+//        JsonObject withdrawObj = new JsonObject();
+//        withdrawObj.addProperty("amounts", "0.002");
+//        withdrawObj.addProperty("to_addresses", "2N8pEWg9ZPyxa2yioZWDYAzNFyTnYp6TkHF");
 //        obj.addProperty("port", "8080");
 //        obj.addProperty("pin", "was1qwas1q");
 //        JsonObject options = new JsonObject();
@@ -36,9 +39,9 @@ public class Main {
         String apiKey = "27d6-fc3a-1606-e6d4";
         String pin = "";
         BlockIo test = new BlockIo(apiKey, pin);
-        System.out.println("withdraw args: " + withdrawObj);
-        Map<String, Object> res = test._withdraw("POST", "withdraw", new Gson().toJson(withdrawObj));
-        System.out.println(res.get("network"));
+        System.out.println("sweep args: " + sweepObj);
+        Map<String, Object> res = test._sweep("POST", "sweep_from_address", new Gson().toJson(sweepObj));
+        System.out.println(res);
         //new Gson().toJson(Options) Converts maps and Json object to json string
     }
 }
