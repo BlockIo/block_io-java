@@ -48,7 +48,7 @@ public class BlockIo {
     public BlockIo(String config, String pin, int version, String options ) throws UnsupportedEncodingException {
         Options = parseJson(options);
         Options.put("allowNoPin", false);
-        Pin = pin;
+        Pin = pin.equals("") ? null : pin;
         AesKey = null;
         Map<String, Object> ConfigObj;
 
@@ -158,7 +158,9 @@ public class BlockIo {
 
         Response response = RestClient.newCall(request).execute();
         assert response.body() != null;
-        return response.body().string();
+        String res = response.body().string();
+        response.body().close();
+        return res;
     }
 
     private String post(String json, String path) throws IOException {
@@ -171,7 +173,9 @@ public class BlockIo {
                 .build();
         Response response = RestClient.newCall(request).execute();
         assert response.body() != null;
-        return response.body().string();
+        String res = response.body().string();
+        response.body().close();
+        return res;
     }
 
 }
