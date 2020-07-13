@@ -8,21 +8,24 @@ import org.bitcoinj.core.Sha256Hash;
 import org.bitcoinj.core.Utils;
 import org.bouncycastle.util.encoders.Hex;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
+import java.util.Map;
+
+import static com.blockio.lib.JsonUtils.getMapFromObj;
 
 public class Main {
-    public static void main(String[] args) throws UnsupportedEncodingException {
-        JsonObject obj = new JsonObject();
-        obj.addProperty("api_key", "2341234");
-        obj.addProperty("version", 3);
-        obj.addProperty("server", "wasiq.io");
-        obj.addProperty("port", "8080");
-        obj.addProperty("pin", "was1qwas1q");
-        JsonObject options = new JsonObject();
-        options.addProperty("option1", 1);
-        options.addProperty("options2", 2);
-        obj.addProperty("options", new Gson().toJson(options));
+    public static void main(String[] args) throws Exception {
+        JsonObject withdrawObj = new JsonObject();
+        withdrawObj.addProperty("amounts", "0.002");
+        withdrawObj.addProperty("to_addresses", "2N8pEWg9ZPyxa2yioZWDYAzNFyTnYp6TkHF");
+//        obj.addProperty("port", "8080");
+//        obj.addProperty("pin", "was1qwas1q");
+//        JsonObject options = new JsonObject();
+//        options.addProperty("option1", 1);
+//        options.addProperty("options2", 2);
+//        obj.addProperty("options", new Gson().toJson(options));
 //        JsonArray objArr = new JsonArray();
 //        objArr.add("this");
 //        objArr.add("is");
@@ -30,7 +33,12 @@ public class Main {
 //        obj.add("param3", objArr);
 //        System.out.println(new Gson().toJson(obj));
 //        BlockIo test = new BlockIo(new Gson().toJson(obj));
-        BlockIo test = new BlockIo(new Gson().toJson(obj));
+        String apiKey = "27d6-fc3a-1606-e6d4";
+        String pin = "";
+        BlockIo test = new BlockIo(apiKey, pin);
+        System.out.println("withdraw args: " + withdrawObj);
+        Map<String, Object> res = test._withdraw("POST", "withdraw", new Gson().toJson(withdrawObj));
+        System.out.println(res.get("network"));
         //new Gson().toJson(Options) Converts maps and Json object to json string
     }
 }
