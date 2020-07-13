@@ -39,9 +39,9 @@ public class Main {
         String apiKey = "27d6-fc3a-1606-e6d4";
         String pin = "";
         BlockIo test = new BlockIo(apiKey, pin);
-        System.out.println("sweep args: " + sweepObj);
-        Map<String, Object> res = test._sweep("POST", "sweep_from_address", new Gson().toJson(sweepObj));
-        System.out.println(res);
+        System.out.println("get balance: " + test.GetBalance("{}").get("available_balance"));
+//        Map<String, Object> res = test._sweep("POST", "sweep_from_address", new Gson().toJson(sweepObj));
+//        System.out.println(res);
         //new Gson().toJson(Options) Converts maps and Json object to json string
     }
 }
