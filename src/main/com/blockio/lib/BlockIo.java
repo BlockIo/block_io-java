@@ -127,6 +127,33 @@ public class BlockIo {
         return _request(method, "sign_and_finalize_withdrawal", new Gson().toJson(pojo));
     }
 
+    public Map<String, Object> _sweep(String method, String path, String args) throws Exception {
+        ECKey keyFromWif = null;
+        Map<String, Object> res = null;
+        Map<String, Object> argsObj = parseJson(args);
+
+        if(argsObj.get("to_address") == null){
+            throw new Exception("Missing mandatory private_key argument.");
+        }
+        String privKeyStr = argsObj.get("private_key").toString();
+        keyFromWif = Key.fromWif(privKeyStr);
+        argsObj.put("public_key", keyFromWif.getPublicKeyAsHex());
+        argsObj.put("private_key", "");
+        res = _request(method, path, new Gson().toJson(argsObj));
+        JsonElement jsonElement = new Gson().toJsonTree(res);
+        SignatureJson pojo = new Gson().fromJson(jsonElement, SignatureJson.class);
+        if(pojo.getReferenceId() == null) {
+            return res;
+        }
+        for(Input input : pojo.getInputs()){
+            for(Signer signer : input.getSigners()){
+                signer.setSignedData(Helper.signInputs(keyFromWif, input.getDataToSign(), pojo.getEncryptedPassphrase().getSignerPublicKey()));
+            }
+        }
+        keyFromWif = null;
+        return _request(method, "sign_and_finalize_sweep", new Gson().toJson(pojo));
+    }
+
     private Map<String, Object> _request(String method, String path, String args) throws Exception {
         Map<String, Object> res = null;
 
