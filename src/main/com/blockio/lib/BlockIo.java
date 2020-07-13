@@ -184,7 +184,9 @@ public class BlockIo {
         Response response = RestClient.newCall(request).execute();
         assert response.body() != null;
         String res = response.body().string();
-        response.body().close();
+        RestClient.dispatcher().executorService().shutdown();
+        RestClient.connectionPool().evictAll();
+
         return res;
     }
 
@@ -199,7 +201,9 @@ public class BlockIo {
         Response response = RestClient.newCall(request).execute();
         assert response.body() != null;
         String res = response.body().string();
-        response.body().close();
+        RestClient.dispatcher().executorService().shutdown();
+        RestClient.connectionPool().evictAll();
+
         return res;
     }
 
