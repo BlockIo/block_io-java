@@ -1,4 +1,4 @@
-package com.blockio.lib;
+package io.block.lib;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;

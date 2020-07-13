@@ -1,4 +1,4 @@
-package com.blockio.lib;
+package io.block.lib;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
@@ -10,9 +10,6 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import java.util.Map;
-
-import static com.blockio.lib.JsonUtils.isJson;
-import static com.blockio.lib.JsonUtils.parseJson;
 
 public class BlockIo {
     private OkHttpClient RestClient;
@@ -44,14 +41,14 @@ public class BlockIo {
     }
 
     public BlockIo(String config, String pin, int version, String options ) throws UnsupportedEncodingException {
-        Options = parseJson(options);
+        Options = JsonUtils.parseJson(options);
         Options.put("allowNoPin", false);
         Pin = pin.equals("") ? null : pin;
         AesKey = null;
         Map<String, Object> ConfigObj;
 
-        if(isJson(config)){
-            ConfigObj = parseJson(config);
+        if(JsonUtils.isJson(config)){
+            ConfigObj = JsonUtils.parseJson(config);
             ApiKey = ConfigObj.get("api_key").toString();
             if (ConfigObj.get("version") != null) this.Version = (int) Math.round((double)ConfigObj.get("version")); else this.Version = this.DefaultVersion;
             if (ConfigObj.get("server") != null) this.Server = ConfigObj.get("server").toString(); else this.Server = this.DefaultServer;
@@ -64,7 +61,7 @@ public class BlockIo {
             }
             if(ConfigObj.get("options") != null)
             {
-                this.Options = parseJson(ConfigObj.get("options").toString());
+                this.Options = JsonUtils.parseJson(ConfigObj.get("options").toString());
                 this.Options.put("allowNoPin", false);
             }
 
@@ -93,7 +90,7 @@ public class BlockIo {
 
     private Map<String, Object> _withdraw(String method, String path, String args) throws Exception {
         Map<String, Object> res = null;
-        Map<String, Object> argsObj = parseJson(args);
+        Map<String, Object> argsObj = JsonUtils.parseJson(args);
         String pin = argsObj.get("pin") != null ? argsObj.get("pin").toString() : Pin;
         argsObj.put("pin", "");
         res = _request(method, path, new Gson().toJson(argsObj));
@@ -128,7 +125,7 @@ public class BlockIo {
     private Map<String, Object> _sweep(String method, String path, String args) throws Exception {
         ECKey keyFromWif = null;
         Map<String, Object> res = null;
-        Map<String, Object> argsObj = parseJson(args);
+        Map<String, Object> argsObj = JsonUtils.parseJson(args);
 
         if(argsObj.get("to_address") == null){
             throw new Exception("Missing mandatory private_key argument.");
@@ -161,15 +158,15 @@ public class BlockIo {
                 postObj.addProperty("signature_data", args);
                 args = new Gson().toJson(postObj);
             }
-            res = parseJson(post(args, path));
+            res = JsonUtils.parseJson(post(args, path));
         }
         else{
-            res = parseJson(get(path));
+            res = JsonUtils.parseJson(get(path));
         }
         if(!res.get("status").equals("success")){
             throw new Exception(res.get("data").toString());
         }
-        return parseJson(new Gson().toJson(res.get("data")));
+        return JsonUtils.parseJson(new Gson().toJson(res.get("data")));
     }
 
     private String constructUrl(String path){

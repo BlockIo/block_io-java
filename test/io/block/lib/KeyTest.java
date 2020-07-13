@@ -1,4 +1,4 @@
-package com.blockio.lib;
+package io.block.lib;
 
 import org.bitcoinj.core.ECKey;
 import org.junit.jupiter.api.Test;
