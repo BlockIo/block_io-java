@@ -1,12 +1,13 @@
 package io.block.lib;
 
 import com.google.gson.JsonObject;
+import io.block.examples.Basic;
 
 public class Main {
     public static void main(String[] args) throws Exception {
-        JsonObject sweepObj = new JsonObject();
-        sweepObj.addProperty("to_address", "my9gXk65EzZUL962MSJadPXJFmJzPDc1WT");
-        sweepObj.addProperty("private_key", "cUhedoiwPkprm99qfUKzixsrpN3w6wT2XrrMjqo3Yh1tHz8ykVKc");
+//        JsonObject sweepObj = new JsonObject();
+//        sweepObj.addProperty("to_address", "my9gXk65EzZUL962MSJadPXJFmJzPDc1WT");
+//        sweepObj.addProperty("private_key", "cUhedoiwPkprm99qfUKzixsrpN3w6wT2XrrMjqo3Yh1tHz8ykVKc");
 //        JsonObject withdrawObj = new JsonObject();
 //        withdrawObj.addProperty("amounts", "0.002");
 //        withdrawObj.addProperty("to_addresses", "2N8pEWg9ZPyxa2yioZWDYAzNFyTnYp6TkHF");
@@ -23,13 +24,16 @@ public class Main {
 //        obj.add("param3", objArr);
 //        System.out.println(new Gson().toJson(obj));
 //        BlockIo test = new BlockIo(new Gson().toJson(obj));
-        String apiKey = "27d6-fc3a-1606-e6d4";
-        String pin = "";
-        BlockIo test = new BlockIo(apiKey, pin);
-        System.out.println("get balance: " + test.GetBalance("{}").get("available_balance"));
+//        String apiKey = "27d6-fc3a-1606-e6d4";
+//        String pin = "";
+//        BlockIo test = new BlockIo(apiKey, pin);
+//        System.out.println("get balance: " + test.GetBalance("{}").get("available_balance"));
 //        Map<String, Object> res = test._sweep("POST", "sweep_from_address", new Gson().toJson(sweepObj));
 //        System.out.println(res);
         //new Gson().toJson(Options) Converts maps and Json object to json string
+
+        Basic basicExamplee = new Basic();
+        basicExamplee.RunBasicExample();
     }
 }
 

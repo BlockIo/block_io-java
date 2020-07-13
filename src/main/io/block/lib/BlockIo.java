@@ -163,8 +163,9 @@ public class BlockIo {
         else{
             res = JsonUtils.parseJson(get(path));
         }
+
         if(!res.get("status").equals("success")){
-            throw new Exception(res.get("data").toString());
+            throw new Exception(res + "");
         }
         return JsonUtils.parseJson(new Gson().toJson(res.get("data")));
     }
