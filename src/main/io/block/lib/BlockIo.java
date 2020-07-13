@@ -91,8 +91,10 @@ public class BlockIo {
     private Map<String, Object> _withdraw(String method, String path, String args) throws Exception {
         Map<String, Object> res = null;
         Map<String, Object> argsObj = JsonUtils.parseJson(args);
+
         String pin = argsObj.get("pin") != null ? argsObj.get("pin").toString() : Pin;
-        argsObj.put("pin", "");
+        argsObj.put("pin", null);
+
         res = _request(method, path, new Gson().toJson(argsObj));
         JsonElement jsonElement = new Gson().toJsonTree(res);
         SignatureJson pojo = new Gson().fromJson(jsonElement, SignatureJson.class);

@@ -14,9 +14,9 @@ public class Basic {
         blockIo = new BlockIo(dotenv.get("API_KEY"), dotenv.get("PIN"));
     }
     public void RunBasicExample() throws Exception {
-        System.out.println("Get New Address: " + blockIo.GetNewAddress("{\"label\": \"testDest7\"}"));
-        System.out.println("Withdraw from labels: " + blockIo.WithdrawFromLabels("{\"from_labels\": \"default\", \"to_label\": \"testDest7\", \"amount\": 2.5}"));
-        System.out.println("Get Address Balance: " + blockIo.GetAddressBalance("{\"labels\": \"default, testDest7\"]}"));
+        System.out.println("Get New Address: " + blockIo.GetNewAddress("{\"label\": \"testDest15\"}"));
+        System.out.println("Withdraw from labels: " + blockIo.WithdrawFromLabels("{\"from_labels\": \"default\", \"to_label\": \"testDest15\", \"amount\": \"2.5\"}"));
+        System.out.println("Get Address Balance: " + blockIo.GetAddressBalance("{\"labels\": \"default, testDest15\"}"));
         System.out.println("Get Sent Transactions: " + blockIo.GetTransactions("{\"type\": \"sent\"}"));
         System.out.println("Get Received Transactions: " + blockIo.GetTransactions("{\"type\": \"received\"}"));
         System.out.println("Get Current Price: " + blockIo.GetCurrentPrice("{\"base_price\": \"BTC\"}"));
