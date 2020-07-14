@@ -1,7 +1,7 @@
 package io.block.lib;
 
-import com.google.gson.JsonObject;
 import io.block.examples.Basic;
+import io.block.examples.DTrust;
 
 public class Main {
     public static void main(String[] args) throws Exception {
@@ -32,8 +32,8 @@ public class Main {
 //        System.out.println(res);
         //new Gson().toJson(Options) Converts maps and Json object to json string
 
-        Basic basicExamplee = new Basic();
-        basicExamplee.RunBasicExample();
+        DTrust dTrustExample = new DTrust();
+        dTrustExample.RunDtrustExample();
     }
 }
 

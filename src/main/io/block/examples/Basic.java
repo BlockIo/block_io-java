@@ -1,8 +1,6 @@
 package io.block.examples;
 
-import com.google.gson.JsonObject;
 import io.block.lib.BlockIo;
-import io.block.lib.JsonUtils;
 import io.github.cdimascio.dotenv.Dotenv;
 import java.io.UnsupportedEncodingException;
 
@@ -10,7 +8,6 @@ public class Basic {
     private BlockIo blockIo;
     public Basic() throws UnsupportedEncodingException {
         Dotenv dotenv = Dotenv.load();
-        System.out.println("APi key: " + dotenv.get("API_KEY"));
         blockIo = new BlockIo(dotenv.get("API_KEY"), dotenv.get("PIN"));
     }
     public void RunBasicExample() throws Exception {

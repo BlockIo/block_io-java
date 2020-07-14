@@ -167,7 +167,7 @@ public class BlockIo {
         }
 
         if(!res.get("status").equals("success")){
-            throw new Exception(res + "");
+            return res;
         }
         return JsonUtils.parseJson(new Gson().toJson(res.get("data")));
     }
