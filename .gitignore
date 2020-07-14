@@ -5,6 +5,7 @@
 out/
 .DS_Store
 *.env
+target/
 
 # Log file
 *.log
