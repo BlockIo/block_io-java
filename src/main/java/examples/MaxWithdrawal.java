@@ -1,8 +1,7 @@
-package io.block.examples;
+package examples;
 
 import com.google.gson.Gson;
-import io.block.lib.BlockIo;
-import io.block.lib.JsonUtils;
+import lib.*;
 import io.github.cdimascio.dotenv.Dotenv;
 
 import java.io.UnsupportedEncodingException;

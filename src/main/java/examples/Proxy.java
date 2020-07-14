@@ -1,6 +1,6 @@
-package io.block.examples;
+package examples;
 
-import io.block.lib.BlockIo;
+import lib.BlockIo;
 import io.github.cdimascio.dotenv.Dotenv;
 
 import java.io.UnsupportedEncodingException;

@@ -1,4 +1,4 @@
-package io.block.lib;
+package lib;
 
 import org.bitcoinj.core.Base58;
 import org.bitcoinj.core.ECKey;

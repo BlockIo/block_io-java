@@ -1,6 +1,6 @@
-package io.block.lib;
+package lib;
 
-import io.block.examples.*;
+import examples.*;
 
 public class Main {
     public static void main(String[] args) throws Exception {

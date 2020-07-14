@@ -1,4 +1,4 @@
-package io.block.lib;
+package lib;
 
 import org.bitcoinj.core.ECKey;
 import org.junit.jupiter.api.Test;
@@ -26,28 +26,28 @@ public class KeyTest {
     KeyTest() throws Exception {
     }
 
-    @Test
+    @org.junit.jupiter.api.Test
     void fromWif() {
         assertEquals(controlPrivKeyFromWif, privKeyFromWif.getPrivateKeyAsHex());
     }
 
-    @Test
+    @org.junit.jupiter.api.Test
     void extractKeyFromPassphrase() {
         assertEquals(controlPrivKeyFromPassphrase, privKeyFromPassphrase.getPrivateKeyAsHex());
     }
-    @Test
+    @org.junit.jupiter.api.Test
     void pubKeyFromWif() {
         assertEquals(controlPubKeyFromWif, pubKeyFromWif);
     }
-    @Test
+    @org.junit.jupiter.api.Test
     void pubKeyFromPassphrase() {
         assertEquals(controlPubKeyFromPassphrase, pubKeyFromPassphrase);
     }
-    @Test
+    @org.junit.jupiter.api.Test
     void signDataWifKey() {
         assertEquals(Helper.signInputs(privKeyFromWif, dataToSign, pubKeyFromWif), controlSignedDataWifKey);
     }
-    @Test
+    @org.junit.jupiter.api.Test
     void signDataPassphraseKey() {
         assertEquals(Helper.signInputs(privKeyFromPassphrase, dataToSign, pubKeyFromPassphrase), controlSignedDataPassphraseKey);
     }

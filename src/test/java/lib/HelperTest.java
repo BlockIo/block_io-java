@@ -1,4 +1,4 @@
-package io.block.lib;
+package lib;
 
 import org.bouncycastle.util.encoders.Hex;
 import org.junit.jupiter.api.Test;
@@ -15,21 +15,21 @@ public class HelperTest {
     private String controlAesKey = "0EeMOVtm5YihUYzdCNgleqIUWkwgvNBcRmr7M0t9GOc=";
     private String controlHashedData = "5f78c33274e43fa9de5659265c1d917e25c03722dcb0b8d27db8d5feaa813953";
 
-    @Test
+    @org.junit.jupiter.api.Test
     void pinToAesKey() throws UnsupportedEncodingException {
         assertEquals(controlAesKey, Helper.pinToAesKey(pin));
     }
 
-    @Test
+    @org.junit.jupiter.api.Test
     void encrypt() {
         assertEquals(controlCipherText, Helper.encrypt(controlClearText, controlAesKey));
     }
 
-    @Test
+    @org.junit.jupiter.api.Test
     void decrypt() {
         assertEquals(controlClearText, Helper.decrypt(controlCipherText, controlAesKey));
     }
-    @Test
+    @org.junit.jupiter.api.Test
     void sha256Hash() throws NoSuchAlgorithmException {
         String testData = "deadbeef";
         String shaData = Hex.toHexString(Helper.sha256Hash(Hex.decode(testData)));

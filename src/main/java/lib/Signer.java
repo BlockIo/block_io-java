@@ -1,16 +1,16 @@
-package io.block.lib;
+package lib;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class EncryptedPassphrase {
+public class Signer {
 
     @SerializedName("signer_public_key")
     @Expose
     private String signerPublicKey;
-    @SerializedName("passphrase")
+    @SerializedName("signed_data")
     @Expose
-    private String passphrase;
+    private String signedData;
 
     public String getSignerPublicKey() {
         return signerPublicKey;
@@ -20,12 +20,12 @@ public class EncryptedPassphrase {
         this.signerPublicKey = signerPublicKey;
     }
 
-    public String getPassphrase() {
-        return passphrase;
+    public String getSignedData() {
+        return signedData;
     }
 
-    public void setPassphrase(String passphrase) {
-        this.passphrase = passphrase;
+    public void setSignedData(String signedData) {
+        this.signedData = signedData;
     }
 
 }

@@ -1,4 +1,4 @@
-package io.block.lib;
+package lib;
 
 import org.bitcoinj.core.ECKey;
 import org.bitcoinj.core.Sha256Hash;

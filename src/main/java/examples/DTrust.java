@@ -1,8 +1,8 @@
-package io.block.examples;
+package examples;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
-import io.block.lib.*;
+import lib.*;
 import io.github.cdimascio.dotenv.Dotenv;
 import org.bitcoinj.core.ECKey;
 
@@ -34,7 +34,7 @@ public class DTrust {
             }
         };
 
-        PublicKeys = new ArrayList<>() {
+        PublicKeys = new ArrayList<String>() {
             {
                 add(PrivKeys.get(0).getPublicKeyAsHex());
                 add(PrivKeys.get(1).getPublicKeyAsHex());
