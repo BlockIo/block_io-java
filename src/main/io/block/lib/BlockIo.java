@@ -43,7 +43,7 @@ public class BlockIo {
     public BlockIo(String config, String pin, int version, String options ) throws UnsupportedEncodingException {
         Options = JsonUtils.parseJson(options);
         Options.put("allowNoPin", false);
-        Pin = pin.equals("") ? null : pin;
+        Pin = pin == null || pin.equals("") ? null : pin;
         AesKey = null;
         Map<String, Object> ConfigObj;
 
