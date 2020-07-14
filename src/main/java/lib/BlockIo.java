@@ -191,8 +191,8 @@ public class BlockIo {
     }
 
     private String post(String json, String path) throws IOException {
-        final MediaType JSON = MediaType.get("application/json; charset=utf-8");
-        RequestBody body = RequestBody.create(JSON, json);
+        MediaType type = MediaType.get("application/json; charset=utf-8");
+        RequestBody body = RequestBody.create(type, json);
         Request request = new Request.Builder()
                 .url(constructUrl(path))
                 .addHeader("Accept", "application/json")
