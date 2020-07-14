@@ -5,7 +5,7 @@ import io.github.cdimascio.dotenv.Dotenv;
 import java.io.UnsupportedEncodingException;
 
 public class Basic {
-    private BlockIo blockIo;
+    private final BlockIo blockIo;
     public Basic() throws UnsupportedEncodingException {
         Dotenv dotenv = Dotenv.load();
         blockIo = new BlockIo(dotenv.get("API_KEY"), dotenv.get("PIN"));

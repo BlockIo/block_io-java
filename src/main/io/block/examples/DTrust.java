@@ -2,7 +2,6 @@ package io.block.examples;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import io.block.lib.*;
 import io.github.cdimascio.dotenv.Dotenv;
 import org.bitcoinj.core.ECKey;
@@ -12,7 +11,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
 public class DTrust {
-    private BlockIo blockIo;
+    private final BlockIo blockIo;
     String DtrustAddress;
     String DtrustAddressLabel;
     List<String> PublicKeys;
@@ -45,7 +44,6 @@ public class DTrust {
         };
     }
 
-    @SuppressWarnings("unchecked")
     public void RunDtrustExample() throws Exception {
 
         String signers = String.join(",", PublicKeys);

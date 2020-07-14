@@ -2,6 +2,7 @@ package io.block.lib;
 
 import io.block.examples.Basic;
 import io.block.examples.DTrust;
+import io.block.examples.MaxWithdrawal;
 
 public class Main {
     public static void main(String[] args) throws Exception {
@@ -32,8 +33,8 @@ public class Main {
 //        System.out.println(res);
         //new Gson().toJson(Options) Converts maps and Json object to json string
 
-        DTrust dTrustExample = new DTrust();
-        dTrustExample.RunDtrustExample();
+        MaxWithdrawal maxWithdrawalEx = new MaxWithdrawal();
+        maxWithdrawalEx.RunMaxWithdrawalExample();
     }
 }
 
