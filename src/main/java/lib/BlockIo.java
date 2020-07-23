@@ -45,6 +45,7 @@ public class BlockIo {
         Options.put("allowNoPin", false);
         Pin = pin == null || pin.equals("") ? null : pin;
         AesKey = null;
+        ApiUrl = null;
         Map<String, Object> ConfigObj;
 
         if(JsonUtils.isJson(config)){
@@ -75,10 +76,13 @@ public class BlockIo {
                 AesKey = Helper.pinToAesKey(Pin);
             }
         }
+        if(Options.get("api_url") != null) {
+            ApiUrl = Options.get("api_url").toString() + "/api/v2";
+        }
         String serverString = !Server.equals("") ? Server + "." : Server;
         String portString = !Port.equals("") ? ":" + Port : Port;
 
-        ApiUrl = "https://" + serverString + Host + portString + "/api/v" + Version;
+        ApiUrl = ApiUrl == null ? "https://" + serverString + Host + portString + "/api/v" + Version : ApiUrl;
 
         ConnectionSpec requireTls12 = new ConnectionSpec.Builder(ConnectionSpec.MODERN_TLS)
                 .tlsVersions(TlsVersion.TLS_1_2)
