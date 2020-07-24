@@ -2,6 +2,7 @@ package lib;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import lib.BlockIo;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -10,9 +11,9 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Map;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
@@ -33,7 +34,7 @@ class ClientMock {
     private BlockIo blockIo;
 
     @BeforeEach
-    void setup() {
+    void setup() throws IOException, ParseException {
         api_key = "0000-0000-0000-0000";
         this.wireMockServer = new WireMockServer(8080);
         this.wireMockServer.start();
@@ -59,96 +60,75 @@ class ClientMock {
         sweepRequestBodyContent.put("private_key", "cTYLVcC17cYYoRjaBu15rEcD5WuDyowAw562q2F1ihcaomRJENu5");
 
         setupWithdrawStub();
+        readSignAndFinalizeWithdrawRequestJson();
+
         setupSweepStub();
+        readSignAndFinalizeSweepRequestJson();
+
         setupDtrustStub();
+        readSignAndFinalizeDtrustRequestJson();
     }
     @AfterEach
     void stopWireMockServer() {
         this.wireMockServer.stop();
     }
-    public void readSignAndFinalizeWithdrawRequestJson() throws FileNotFoundException, ParseException {
-        JSONParser jsonParser = new JSONParser();
-        try (FileReader reader = new FileReader("json/sign_and_finalize_withdrawal_request.json"))
-        {
-            //Read JSON file
-            Object obj = jsonParser.parse(reader);
 
-            signAndFinalizeWithdraw = (JSONObject) obj;
-            System.out.println(signAndFinalizeWithdraw);
-
-        } catch (IOException | ParseException e) {
-            e.printStackTrace();
-        }
+    void readSignAndFinalizeWithdrawRequestJson() throws IOException {
+        String jsonString = new String(Files.readAllBytes(Paths.get("src/test/resources/__files/json/sign_and_finalize_withdrawal_request.json")));
+        signAndFinalizeWithdraw = new Gson().fromJson(jsonString, JSONObject.class);
     }
-    public void readSignAndFinalizeSweepRequestJson() throws FileNotFoundException, ParseException {
-        JSONParser jsonParser = new JSONParser();
-        try (FileReader reader = new FileReader("json/sign_and_finalize_sweep_request.json"))
-        {
-            //Read JSON file
-            Object obj = jsonParser.parse(reader);
-
-            signAndFinalizeSweep = (JSONObject) obj;
-            System.out.println(signAndFinalizeSweep);
-
-        } catch (IOException | ParseException e) {
-            e.printStackTrace();
-        }
+    void readSignAndFinalizeSweepRequestJson() throws IOException {
+        String jsonString = new String(Files.readAllBytes(Paths.get("src/test/resources/__files/json/sign_and_finalize_sweep_request.json")));
+        signAndFinalizeSweep = new Gson().fromJson(jsonString, JSONObject.class);
     }
-    public void readSignAndFinalizeDtrustRequestJson() throws FileNotFoundException, ParseException {
-        JSONParser jsonParser = new JSONParser();
-        try (FileReader reader = new FileReader("json/sign_and_finalize_dtrust_withdrawal_request.json"))
-        {
-            //Read JSON file
-            Object obj = jsonParser.parse(reader);
-
-            signAndFinalizeDtrust = (JSONObject) obj;
-            System.out.println(signAndFinalizeDtrust);
-
-        } catch (IOException | ParseException e) {
-            e.printStackTrace();
-        }
+    void readSignAndFinalizeDtrustRequestJson() throws IOException {
+        String jsonString = new String(Files.readAllBytes(Paths.get("src/test/resources/__files/json/sign_and_finalize_dtrust_withdrawal_request.json")));
+        signAndFinalizeDtrust = new Gson().fromJson(jsonString, JSONObject.class);
     }
 
     public void setupWithdrawStub(){
-        wireMockServer.stubFor(post(urlEqualTo("/api/v2/withdraw"))
+        wireMockServer.stubFor(post(urlPathEqualTo("/api/v2/withdraw"))
                 .willReturn(aResponse().withHeader("Content-Type", "application/json")
                         .withStatus(200)
-                        .withHeader("Content-Type", "application/json")
+                        .withHeader("Accept", "application/json")
                         .withBodyFile("json/withdraw_response.json")));
 
-        wireMockServer.stubFor(post(urlEqualTo("/api/v2/sign_and_finalize_withdrawal"))
-                .withRequestBody(equalToJson(new Gson().toJson(signAndFinalizeWithdraw)))
+        wireMockServer.stubFor(post(urlPathEqualTo("/api/v2/sign_and_finalize_withdrawal"))
+                .withHeader("Accept", containing("application/json"))
+                .withRequestBody(equalToJson(new Gson().toJson(signAndFinalizeWithdraw), true, true))
                 .willReturn(aResponse().withHeader("Content-Type", "application/json")
                         .withStatus(200)
-                        .withHeader("Content-Type", "application/json")
+                        .withHeader("Accept", "application/json")
                         .withBodyFile("json/success_response.json")));
     }
     public void setupSweepStub(){
-        wireMockServer.stubFor(post(urlEqualTo("/api/v2/sweep_from_address"))
+        wireMockServer.stubFor(post(urlPathEqualTo("/api/v2/sweep_from_address"))
                 .willReturn(aResponse().withHeader("Content-Type", "application/json")
                         .withStatus(200)
-                        .withHeader("Content-Type", "application/json")
+                        .withHeader("Accept", "application/json")
                         .withBodyFile("json/sweep_from_address_response.json")));
 
-        wireMockServer.stubFor(post(urlEqualTo("/api/v2/sign_and_finalize_sweep"))
-                .withRequestBody(equalToJson(new Gson().toJson(signAndFinalizeSweep)))
+        wireMockServer.stubFor(post(urlPathEqualTo("/api/v2/sign_and_finalize_sweep"))
+                .withHeader("Accept", containing("application/json"))
+                .withRequestBody(equalToJson(new Gson().toJson(signAndFinalizeSweep), true, true))
                 .willReturn(aResponse().withHeader("Content-Type", "application/json")
                         .withStatus(200)
-                        .withHeader("Content-Type", "application/json")
+                        .withHeader("Accept", "application/json")
                         .withBodyFile("json/success_response.json")));
     }
     public void setupDtrustStub(){
-        wireMockServer.stubFor(post(urlEqualTo("/api/v2/withdraw_from_dtrust_address"))
+        wireMockServer.stubFor(post(urlPathEqualTo("/api/v2/withdraw_from_dtrust_address"))
                 .willReturn(aResponse().withHeader("Content-Type", "application/json")
                         .withStatus(200)
-                        .withHeader("Content-Type", "application/json")
+                        .withHeader("Accept", "application/json")
                         .withBodyFile("json/withdraw_from_dtrust_address_response.json")));
 
-        wireMockServer.stubFor(post(urlEqualTo("/api/v2/sign_and_finalize_withdrawal"))
-                .withRequestBody(equalToJson(new Gson().toJson(signAndFinalizeDtrust)))
+        wireMockServer.stubFor(post(urlPathEqualTo("/api/v2/sign_and_finalize_withdrawal"))
+                .withHeader("Accept", containing("application/json"))
+                .withRequestBody(equalToJson(new Gson().toJson(signAndFinalizeDtrust), true, true))
                 .willReturn(aResponse().withHeader("Content-Type", "application/json")
                         .withStatus(200)
-                        .withHeader("Content-Type", "application/json")
+                        .withHeader("Accept", "application/json")
                         .withBodyFile("json/success_response.json")));
     }
 
@@ -156,24 +136,20 @@ class ClientMock {
     void Withdraw() throws Exception {
         String pin = "blockiotestpininsecure";
         blockIo = new BlockIo(api_key, pin, 2, "{\"api_url\": \"http://localhost:8080\"}");
-//        System.out.println(new Gson().toJson(withdrawRequestBodyContent));
         Map<String, Object> response = blockIo.Withdraw(new Gson().toJson(withdrawRequestBodyContent));
-        assertEquals("success", response.get("status"));
-        assertNotNull(response.get("data"));
+        assertNotNull(response.get("txid"));
     }
     @Test
     void Sweep() throws Exception {
         blockIo = new BlockIo(api_key, null, 2, "{\"api_url\": \"http://localhost:8080\"}");
         Map<String, Object> response = blockIo.SweepFromAddress(new Gson().toJson(sweepRequestBodyContent));
-        assertEquals("success", response.get("status"));
-        assertNotNull(response.get("data"));
+        assertNotNull(response.get("txid"));
     }
     @Test
     void Dtrust() throws Exception {
         String pin = "blockiotestpininsecure";
         blockIo = new BlockIo(api_key, pin, 2, "{\"api_url\": \"http://localhost:8080\"}");
         Map<String, Object> response = blockIo.WithdrawFromDtrustAddress(new Gson().toJson(dTrustRequestBodyContent));
-        assertEquals("success", response.get("status"));
-        assertNotNull(response.get("data"));
+        assertNotNull(response);
     }
 }

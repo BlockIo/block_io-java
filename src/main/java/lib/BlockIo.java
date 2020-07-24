@@ -88,7 +88,7 @@ public class BlockIo {
                 .tlsVersions(TlsVersion.TLS_1_2)
                 .build();
         RestClient = new OkHttpClient.Builder()
-                .connectionSpecs(Arrays.asList(requireTls12))
+                .connectionSpecs(Arrays.asList(requireTls12, ConnectionSpec.CLEARTEXT))
                 .build();
     }
 
