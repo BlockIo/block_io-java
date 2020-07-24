@@ -7,10 +7,10 @@ public class Signer {
 
     @SerializedName("signer_public_key")
     @Expose
-    private String signerPublicKey;
+    public String signerPublicKey;
     @SerializedName("signed_data")
     @Expose
-    private String signedData;
+    public String signedData;
 
     public String getSignerPublicKey() {
         return signerPublicKey;

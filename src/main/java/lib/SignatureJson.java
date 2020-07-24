@@ -9,16 +9,16 @@ public class SignatureJson {
 
     @SerializedName("reference_id")
     @Expose
-    private String referenceId;
+    public String referenceId;
     @SerializedName("inputs")
     @Expose
-    private ArrayList<Input> inputs = null;
+    public ArrayList<Input> inputs = null;
     @SerializedName("encrypted_passphrase")
     @Expose
-    private EncryptedPassphrase encryptedPassphrase;
+    public EncryptedPassphrase encryptedPassphrase;
     @SerializedName("unsigned_tx_hex")
     @Expose
-    private String unsignedTxHex;
+    public String unsignedTxHex;
 
     public String getReferenceId() {
         return referenceId;

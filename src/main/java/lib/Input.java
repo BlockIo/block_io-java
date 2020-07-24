@@ -9,16 +9,16 @@ public class Input {
 
     @SerializedName("input_no")
     @Expose
-    private Integer inputNo;
+    public Integer inputNo;
     @SerializedName("signatures_needed")
     @Expose
-    private Integer signaturesNeeded;
+    public Integer signaturesNeeded;
     @SerializedName("data_to_sign")
     @Expose
-    private String dataToSign;
+    public String dataToSign;
     @SerializedName("signers")
     @Expose
-    private ArrayList<Signer> signers = null;
+    public ArrayList<Signer> signers = null;
 
     public Integer getInputNo() {
         return inputNo;

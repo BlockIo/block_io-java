@@ -7,10 +7,10 @@ public class EncryptedPassphrase {
 
     @SerializedName("signer_public_key")
     @Expose
-    private String signerPublicKey;
+    public String signerPublicKey;
     @SerializedName("passphrase")
     @Expose
-    private String passphrase;
+    public String passphrase;
 
     public String getSignerPublicKey() {
         return signerPublicKey;

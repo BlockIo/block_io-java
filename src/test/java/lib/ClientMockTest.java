@@ -1,5 +1,6 @@
 package lib;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -15,11 +16,12 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Map;
+import java.util.Scanner;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.junit.jupiter.api.Assertions.*;
 
-class ClientMock {
+class ClientMockTest {
     private String api_key;
     private WireMockServer wireMockServer;
 
@@ -72,18 +74,23 @@ class ClientMock {
     void stopWireMockServer() {
         this.wireMockServer.stop();
     }
-
-    void readSignAndFinalizeWithdrawRequestJson() throws IOException {
-        String jsonString = new String(Files.readAllBytes(Paths.get("src/test/resources/__files/json/sign_and_finalize_withdrawal_request.json")));
-        signAndFinalizeWithdraw = new Gson().fromJson(jsonString, JSONObject.class);
+    void readSignAndFinalizeWithdrawRequestJson() throws IOException, ParseException {
+        JSONParser parser = new JSONParser();
+        signAndFinalizeWithdraw = (JSONObject) parser.parse(
+                new FileReader("src/test/resources/__files/json/sign_and_finalize_withdrawal_request.json")
+        );
     }
-    void readSignAndFinalizeSweepRequestJson() throws IOException {
-        String jsonString = new String(Files.readAllBytes(Paths.get("src/test/resources/__files/json/sign_and_finalize_sweep_request.json")));
-        signAndFinalizeSweep = new Gson().fromJson(jsonString, JSONObject.class);
+    void readSignAndFinalizeSweepRequestJson() throws IOException, ParseException {
+        JSONParser parser = new JSONParser();
+        signAndFinalizeSweep = (JSONObject) parser.parse(
+                new FileReader("src/test/resources/__files/json/sign_and_finalize_sweep_request.json")
+        );
     }
-    void readSignAndFinalizeDtrustRequestJson() throws IOException {
-        String jsonString = new String(Files.readAllBytes(Paths.get("src/test/resources/__files/json/sign_and_finalize_dtrust_withdrawal_request.json")));
-        signAndFinalizeDtrust = new Gson().fromJson(jsonString, JSONObject.class);
+    void readSignAndFinalizeDtrustRequestJson() throws IOException, ParseException {
+        JSONParser parser = new JSONParser();
+        signAndFinalizeDtrust = (JSONObject) parser.parse(
+                new FileReader("src/test/resources/__files/json/sign_and_finalize_dtrust_withdrawal_request.json")
+        );
     }
 
     public void setupWithdrawStub(){
