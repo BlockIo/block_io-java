@@ -12,7 +12,7 @@ public class Basic {
     }
     public void RunBasicExample() throws Exception {
         System.out.println("Get New Address: " + blockIo.GetNewAddress("{\"label\": \"testDest15\"}"));
-        System.out.println("Withdraw from labels: " + blockIo.WithdrawFromLabels("{\"from_labels\": \"default\", \"to_label\": \"testDest15\", \"amount\": \"2.5\"}"));
+        System.out.println("Withdraw from labels: " + blockIo.WithdrawFromLabels("{\"from_labels\": \"shibe1\", \"to_label\": \"default\", \"amount\": \"2.5\"}"));
         System.out.println("Get Address Balance: " + blockIo.GetAddressBalance("{\"labels\": \"default, testDest15\"}"));
         System.out.println("Get Sent Transactions: " + blockIo.GetTransactions("{\"type\": \"sent\"}"));
         System.out.println("Get Received Transactions: " + blockIo.GetTransactions("{\"type\": \"received\"}"));

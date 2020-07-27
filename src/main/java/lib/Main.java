@@ -4,8 +4,8 @@ import examples.*;
 
 public class Main {
     public static void main(String[] args) throws Exception {
-        Sweeper sweepExample = new Sweeper();
-        sweepExample.RunSweeperExample();
+        Basic basic = new Basic();
+        basic.RunBasicExample();
     }
 }
 

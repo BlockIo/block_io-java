@@ -123,8 +123,7 @@ public class BlockIo {
                 signer.setSignedData(Helper.signInputs(privKey, input.getDataToSign(), pojo.getEncryptedPassphrase().getSignerPublicKey()));
             }
         }
-        aesKey = null;
-        privKey = null;
+        pojo.encryptedPassphrase = null;
         return _request(method, "sign_and_finalize_withdrawal", new Gson().toJson(pojo));
     }
 
