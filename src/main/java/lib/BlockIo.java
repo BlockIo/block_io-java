@@ -54,7 +54,7 @@ public class BlockIo {
             AesKey = Helper.pinToAesKey(Pin);
         }
 
-        if(Opts.getApiUrl() != "") {
+        if(!Opts.getApiUrl().equals("")) {
             ApiUrl = Opts.getApiUrl() + "/api/v2";
         }
         String serverString = !Server.equals("") ? Server + "." : Server;
