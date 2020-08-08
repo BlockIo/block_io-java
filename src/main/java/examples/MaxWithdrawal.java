@@ -6,6 +6,7 @@ import io.github.cdimascio.dotenv.Dotenv;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Map;
+import java.util.Objects;
 
 public class MaxWithdrawal {
     private final BlockIo blockIo;
@@ -17,13 +18,13 @@ public class MaxWithdrawal {
     }
 
     public void RunMaxWithdrawalExample() throws Exception {
-        String balance = blockIo.GetBalance("{}").get("available_balance").toString();
+        String balance = blockIo.GetBalance(null).get("available_balance").toString();
 
         System.out.println("Balance: " + balance);
 
         while (true)
         {
-            Map<String, Object> res = blockIo.Withdraw("{\"to_address\": \"" + dotenv.get("TO_ADDRESS") + "\", \"amount\": \"" + balance + "\"}");
+            Map<String, Object> res = blockIo.Withdraw(Map.of("to_address", Objects.requireNonNull(dotenv.get("TO_ADDRESS")), "amount", balance));
             if(res.get("status") != null) { System.out.println(res.get("data").toString());}
 
             res = JsonUtils.parseJson(new Gson().toJson(res.get("data")));
@@ -33,10 +34,10 @@ public class MaxWithdrawal {
             System.out.println("Max Withdraw Available: " + maxWithdraw);
 
             if (Double.parseDouble(maxWithdraw) == 0) break;
-            blockIo.Withdraw("{\"to_address\": \"" + dotenv.get("TO_ADDRESS") + "\", \"amount\": \"" + maxWithdraw + "\"}");
+            blockIo.Withdraw(Map.of("to_address", Objects.requireNonNull(dotenv.get("TO_ADDRESS")), "amount", maxWithdraw));
         }
 
-        balance = blockIo.GetBalance("{}").get("available_balance").toString();
+        balance = blockIo.GetBalance(null).get("available_balance").toString();
 
         System.out.println("Final Balance: " + balance);
     }

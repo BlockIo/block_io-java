@@ -47,12 +47,12 @@ public class DTrust {
     public void RunDtrustExample() throws Exception {
 
         String signers = String.join(",", PublicKeys);
-        Map<String, Object> res = blockIo.GetNewDtrustAddress("{\"label\": \"" + DtrustAddressLabel + "\", \"public_keys\": \"" + signers + "\", \"required_signatures\": \"3\", \"address_type\": \"witness_v0\"}");
+        Map<String, Object> res = blockIo.GetNewDtrustAddress(Map.of("label", DtrustAddressLabel, "public_keys", signers, "required_signatures", "3", "address_type", "witness_v0" ));
         if(!res.get("status").toString().equals("success")){
             System.out.println("Error: " + res.get("data"));
 
             // if this failed, we probably created the same label before. let's fetch the address then
-            res = blockIo.GetDtrustAddressByLabel("{\"label\": \"" + DtrustAddressLabel + "\"}");
+            res = blockIo.GetDtrustAddressByLabel(Map.of("label", DtrustAddressLabel));
             DtrustAddress = res.get("address").toString();
         }
         else{
@@ -60,18 +60,18 @@ public class DTrust {
         }
         System.out.println("Our dTrust Address: " + DtrustAddress);
 
-        res = blockIo.WithdrawFromLabels("{\"from_labels\": \"default\", \"to_address\": \"" + DtrustAddress + "\", \"amounts\": \"0.001\"}");
+        res = blockIo.WithdrawFromLabels(Map.of("from_labels", "default", "to_address", DtrustAddress, "amounts", "0.001"));
         System.out.println("Withdrawal Response: " + res);
 
-        res = blockIo.GetDtrustAddressBalance("{\"label\": \"" + DtrustAddressLabel + "\"}");
+        res = blockIo.GetDtrustAddressBalance(Map.of("label", DtrustAddressLabel));
         System.out.println("Dtrust address label Balance: " + res);
 
-        res = blockIo.GetAddressByLabel("{\"label\": \"default\"}");
+        res = blockIo.GetAddressByLabel(Map.of("label", "default"));
         String normalAddress = res.get("address").toString();
 
         System.out.println("Withdrawing from dtrust_address_label to the 'default' label in normal multisig");
 
-        res = blockIo.WithdrawFromDtrustAddress("{\"from_labels\": \"" + DtrustAddressLabel + "\", \"to_address\": \"" + normalAddress + "\", \"amounts\": \"0.0009\"}");
+        res = blockIo.WithdrawFromDtrustAddress(Map.of("from_labels", DtrustAddressLabel, "to_address", normalAddress, "amounts", "0.0009"));
         JsonElement jsonElement = new Gson().toJsonTree(res);
         SignatureJson pojo = new Gson().fromJson(jsonElement, SignatureJson.class);
         System.out.println("Withdraw from Dtrust Address response: " + res);
@@ -85,9 +85,9 @@ public class DTrust {
         }
         System.out.println("Our Signed Request: " + new Gson().toJson(pojo));
         System.out.println("Finalize Withdrawal: ");
-        System.out.println(blockIo.SignAndFinalizeWithdrawal(new Gson().toJson(pojo)));
+        System.out.println(blockIo.SignAndFinalizeWithdrawal(pojo));
         System.out.println("Get transactions sent by our dtrust_address_label address: ");
-        System.out.println(blockIo.GetDtrustTransactions("{\"type\": \"sent\", \"labels\": \"" + DtrustAddressLabel + "\"}"));
+        System.out.println(blockIo.GetDtrustTransactions(Map.of("type", "sent", "labels", DtrustAddressLabel)));
 
     }
 }

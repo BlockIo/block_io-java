@@ -23,11 +23,11 @@ public class Sweeper {
             throw new Exception("Error: Missing parameters from env.");
         }
 
-        Map<String, Object> res = blockIo.SweepFromAddress("{" +
-                "\"to_address\": \""          +     dotenv.get("TO_ADDRESS") +
-                "\", \"private_key\": \""     +     dotenv.get("PRIVATE_KEY_FROM_ADDRESS") +
-                "\", \"from_addresss\": \""   +     dotenv.get("FROM_ADDRESS") +
-                "\"}");
+        Map<String, Object> res = blockIo.SweepFromAddress(Map.of(
+                "to_address", dotenv.get("TO_ADDRESS"),
+                "private_key", dotenv.get("PRIVATE_KEY_FROM_ADDRESS"),
+                "from_address", dotenv.get("FROM_ADDRESS"))
+        );
 
         System.out.println("Sweep Res: " + res);
     }

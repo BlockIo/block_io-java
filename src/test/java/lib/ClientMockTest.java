@@ -29,9 +29,9 @@ class ClientMockTest {
     private JSONObject signAndFinalizeSweep;
     private JSONObject signAndFinalizeDtrust;
 
-    private JSONObject withdrawRequestBodyContent;
-    private JSONObject dTrustRequestBodyContent;
-    private JSONObject sweepRequestBodyContent;
+    private Map<String, Object> withdrawRequestBodyContent;
+    private Map<String, Object> dTrustRequestBodyContent;
+    private Map<String, Object> sweepRequestBodyContent;
 
     private BlockIo blockIo;
 
@@ -144,20 +144,20 @@ class ClientMockTest {
         String pin = "blockiotestpininsecure";
 
         blockIo = new BlockIo(api_key, pin, 2, new Options("http://localhost:8080"));
-        Map<String, Object> response = blockIo.Withdraw(new Gson().toJson(withdrawRequestBodyContent));
+        Map<String, Object> response = blockIo.Withdraw(withdrawRequestBodyContent);
         assertNotNull(response.get("txid"));
     }
     @Test
     void Sweep() throws Exception {
         blockIo = new BlockIo(api_key, null, 2, new Options("http://localhost:8080"));
-        Map<String, Object> response = blockIo.SweepFromAddress(new Gson().toJson(sweepRequestBodyContent));
+        Map<String, Object> response = blockIo.SweepFromAddress(sweepRequestBodyContent);
         assertNotNull(response.get("txid"));
     }
     @Test
     void Dtrust() throws Exception {
         String pin = "blockiotestpininsecure";
         blockIo = new BlockIo(api_key, pin, 2, new Options("http://localhost:8080"));
-        Map<String, Object> response = blockIo.WithdrawFromDtrustAddress(new Gson().toJson(dTrustRequestBodyContent));
+        Map<String, Object> response = blockIo.WithdrawFromDtrustAddress(dTrustRequestBodyContent);
         assertNotNull(response);
     }
 }

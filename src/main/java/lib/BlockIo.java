@@ -70,12 +70,15 @@ public class BlockIo {
                 .build();
     }
 
-    private Map<String, Object> _withdraw(String method, String path, String args) throws Exception {
+    private Map<String, Object> _withdraw(String method, String path, Map<String, Object> args) throws Exception {
         Map<String, Object> res = null;
-        Map<String, Object> argsObj = JsonUtils.parseJson(args);
+        Map<String, Object> argsObj = args;
 
-        String pin = argsObj.get("pin") != null ? argsObj.get("pin").toString() : Pin;
-        argsObj.put("pin", null);
+        String pin = Pin;
+        if(argsObj.get("pin") != null) {
+            pin = argsObj.get("pin").toString();
+            argsObj.put("pin", null);
+        }
 
         res = _request(method, path, new Gson().toJson(argsObj));
         JsonElement jsonElement = new Gson().toJsonTree(res);
@@ -105,10 +108,10 @@ public class BlockIo {
         return _request(method, "sign_and_finalize_withdrawal", new Gson().toJson(pojo));
     }
 
-    private Map<String, Object> _sweep(String method, String path, String args) throws Exception {
+    private Map<String, Object> _sweep(String method, String path, Map<String, Object> args) throws Exception {
         ECKey keyFromWif = null;
         Map<String, Object> res = null;
-        Map<String, Object> argsObj = JsonUtils.parseJson(args);
+        Map<String, Object> argsObj = args;
 
         if(argsObj.get("to_address") == null){
             throw new Exception("Missing mandatory private_key argument.");
@@ -128,7 +131,6 @@ public class BlockIo {
                 signer.setSignedData(Helper.signInputs(keyFromWif, input.getDataToSign(), signer.getSignerPublicKey()));
             }
         }
-        keyFromWif = null;
         return _request(method, "sign_and_finalize_sweep", new Gson().toJson(pojo));
     }
 
@@ -186,6 +188,7 @@ public class BlockIo {
         RestClient.connectionPool().evictAll();
 
         return res;
+            
     }
 
     /**
@@ -194,66 +197,201 @@ public class BlockIo {
 
     // Passthrough methods
 
-    public Map<String, Object> GetNewAddress(String args) throws Exception { return _request("POST", "get_new_address", args); }
-    public Map<String, Object> GetBalance(String args) throws Exception { return _request("GET", "get_balance", args); }
-    public Map<String, Object> GetMyAddresses(String args) throws Exception { return _request("POST", "get_my_addresses", args); }
-    public Map<String, Object> GetAddressReceived(String args) throws Exception { return _request("POST", "get_address_received", args); }
-    public Map<String, Object> GetAddressByLabel(String args) throws Exception { return _request("POST", "get_address_by_label", args); }
-    public Map<String, Object> GetAddressBalance(String args) throws Exception { return _request("POST", "get_address_balance", args); }
-    public Map<String, Object> CreateUser(String args) throws Exception { return _request("POST", "create_user", args); }
-    public Map<String, Object> GetUsers(String args) throws Exception { return _request("POST", "get_users", args); }
-    public Map<String, Object> GetUserBalance(String args) throws Exception { return _request("POST", "get_user_balance", args); }
-    public Map<String, Object> GetUserAddress(String args) throws Exception { return _request("POST", "get_user_address", args); }
-    public Map<String, Object> GetUserReceived(String args) throws Exception { return _request("POST", "get_user_received", args); }
-    public Map<String, Object> GetTransactions(String args) throws Exception { return _request("POST", "get_transactions", args); }
-    public Map<String, Object> SignAndFinalizeWithdrawal(String args) throws Exception { return _request("POST", "sign_and_finalize_withdrawal", args); }
-    public Map<String, Object> GetNewDtrustAddress(String args) throws Exception { return _request("POST", "get_new_dtrust_address", args); }
-    public Map<String, Object> GetMyDtrustAddresses(String args) throws Exception { return _request("POST", "get_my_dtrust_addresses", args); }
-    public Map<String, Object> GetDtrustAddressByLabel(String args) throws Exception { return _request("POST", "get_dtrust_address_by_label", args); }
-    public Map<String, Object> GetDtrustTransactions(String args) throws Exception { return _request("POST", "get_dtrust_transactions", args); }
-    public Map<String, Object> GetDtrustAddressBalance(String args) throws Exception { return _request("POST", "get_dtrust_address_balance", args); }
-    public Map<String, Object> GetNetworkFeeEstimate(String args) throws Exception { return _request("POST", "get_network_fee_estimate", args); }
-    public Map<String, Object> ArchiveAddress(String args) throws Exception { return _request("POST", "archive_address", args); }
-    public Map<String, Object> UnarchiveAddress(String args) throws Exception { return _request("POST", "unarchive_address", args); }
-    public Map<String, Object> GetMyArchivedAddresses(String args) throws Exception { return _request("POST", "get_my_archived_addresses", args); }
-    public Map<String, Object> ArchiveDtrustAddress(String args) throws Exception { return _request("POST", "archive_dtrust_address", args); }
-    public Map<String, Object> UnarchiveDtrustAddress(String args) throws Exception { return _request("POST", "unarchive_dtrust_address", args); }
-    public Map<String, Object> GetMyArchivedDtrustAddresses(String args) throws Exception { return _request("POST", "get_my_archived_dtrust_addresses", args); }
-    public Map<String, Object> GetDtrustNetworkFeeEstimate(String args) throws Exception { return _request("POST", "get_dtrust_network_fee_estimate", args); }
-    public Map<String, Object> CreateNotification(String args) throws Exception { return _request("POST", "create_notification", args); }
-    public Map<String, Object> DisableNotification(String args) throws Exception { return _request("POST", "disable_notification", args); }
-    public Map<String, Object> EnableNotification(String args) throws Exception { return _request("POST", "enable_notification", args); }
-    public Map<String, Object> GetNotifications(String args) throws Exception { return _request("POST", "get_notifications", args); }
-    public Map<String, Object> GetRecentNotificationEvents(String args) throws Exception { return _request("POST", "get_recent_notification_events", args); }
-    public Map<String, Object> DeleteNotification(String args) throws Exception { return _request("POST", "delete_notification", args); }
-    public Map<String, Object> ValidateApiKey(String args) throws Exception { return _request("POST", "validate_api_key", args); }
-    public Map<String, Object> SignTransation(String args) throws Exception { return _request("POST", "sign_transaction", args); }
-    public Map<String, Object> FinalizeTransaction(String args) throws Exception { return _request("POST", "finalize_transaction", args); }
-    public Map<String, Object> GetMyAddressesWithoutBalances(String args) throws Exception { return _request("POST", "get_my_addresses_without_balances", args); }
-    public Map<String, Object> GetRawTransaction(String args) throws Exception { return _request("POST", "get_raw_transaction", args); }
-    public Map<String, Object> GetDtrustBalance(String args) throws Exception { return _request("POST", "get_dtrust_balance", args); }
-    public Map<String, Object> ArchiveAddresses(String args) throws Exception { return _request("POST", "archive_addresses", args); }
-    public Map<String, Object> UnarchiveAddresses(String args) throws Exception { return _request("POST", "unarchive_addresses", args); }
-    public Map<String, Object> ArchiveDtrustAddresses(String args) throws Exception { return _request("POST", "archive_dtrust_addresses", args); }
-    public Map<String, Object> UnarchiveDtrustAddresses(String args) throws Exception { return _request("POST", "unarchive_dtrust_addresses", args); }
-    public Map<String, Object> IsValidAddress(String args) throws Exception { return _request("POST", "is_valid_address", args); }
-    public Map<String, Object> GetCurrentPrice(String args) throws Exception { return _request("POST", "get_current_price", args); }
-    public Map<String, Object> GetAccountInfo(String args) throws Exception { return _request("POST", "get_account_info", args) ; }
+    public Map<String, Object> GetNewAddress(Map<String, Object> args) throws Exception { 
+        String argsJson = new Gson().toJson(args);
+        return _request("POST", "get_new_address", argsJson);
+    }
+    public Map<String, Object> GetBalance(Map<String, Object> args) throws Exception { 
+        String argsJson = new Gson().toJson(args);
+        return _request("GET", "get_balance", argsJson);
+    }
+    public Map<String, Object> GetMyAddresses(Map<String, Object> args) throws Exception { 
+        String argsJson = new Gson().toJson(args);
+        return _request("POST", "get_my_addresses", argsJson);
+    }
+    public Map<String, Object> GetAddressReceived(Map<String, Object> args) throws Exception { 
+        String argsJson = new Gson().toJson(args);
+        return _request("POST", "get_address_received", argsJson);
+    }
+    public Map<String, Object> GetAddressByLabel(Map<String, Object> args) throws Exception { 
+        String argsJson = new Gson().toJson(args);
+        return _request("POST", "get_address_by_label", argsJson);
+    }
+    public Map<String, Object> GetAddressBalance(Map<String, Object> args) throws Exception { 
+        String argsJson = new Gson().toJson(args);
+        return _request("POST", "get_address_balance", argsJson);
+    }
+    public Map<String, Object> CreateUser(Map<String, Object> args) throws Exception { 
+        String argsJson = new Gson().toJson(args);
+        return _request("POST", "create_user", argsJson);
+    }
+    public Map<String, Object> GetUsers(Map<String, Object> args) throws Exception { 
+        String argsJson = new Gson().toJson(args);
+        return _request("POST", "get_users", argsJson);
+    }
+    public Map<String, Object> GetUserBalance(Map<String, Object> args) throws Exception { 
+        String argsJson = new Gson().toJson(args);
+        return _request("POST", "get_user_balance", argsJson);
+    }
+    public Map<String, Object> GetUserAddress(Map<String, Object> args) throws Exception { 
+        String argsJson = new Gson().toJson(args);
+        return _request("POST", "get_user_address", argsJson);
+    }
+    public Map<String, Object> GetUserReceived(Map<String, Object> args) throws Exception { 
+        String argsJson = new Gson().toJson(args);
+        return _request("POST", "get_user_received", argsJson);
+    }
+    public Map<String, Object> GetTransactions(Map<String, Object> args) throws Exception { 
+        String argsJson = new Gson().toJson(args);
+        return _request("POST", "get_transactions", argsJson);
+    }
+    public Map<String, Object> SignAndFinalizeWithdrawal(SignatureJson args) throws Exception {
+        String argsJson = new Gson().toJson(args);
+        return _request("POST", "sign_and_finalize_withdrawal", argsJson);
+    }
+    public Map<String, Object> GetNewDtrustAddress(Map<String, Object> args) throws Exception { 
+        String argsJson = new Gson().toJson(args);
+        return _request("POST", "get_new_dtrust_address", argsJson);
+    }
+    public Map<String, Object> GetMyDtrustAddresses(Map<String, Object> args) throws Exception { 
+        String argsJson = new Gson().toJson(args);
+        return _request("POST", "get_my_dtrust_addresses", argsJson);
+    }
+    public Map<String, Object> GetDtrustAddressByLabel(Map<String, Object> args) throws Exception { 
+        String argsJson = new Gson().toJson(args);
+        return _request("POST", "get_dtrust_address_by_label", argsJson);
+    }
+    public Map<String, Object> GetDtrustTransactions(Map<String, Object> args) throws Exception { 
+        String argsJson = new Gson().toJson(args);
+        return _request("POST", "get_dtrust_transactions", argsJson);
+    }
+    public Map<String, Object> GetDtrustAddressBalance(Map<String, Object> args) throws Exception { 
+        String argsJson = new Gson().toJson(args);
+        return _request("POST", "get_dtrust_address_balance", argsJson);
+    }
+    public Map<String, Object> GetNetworkFeeEstimate(Map<String, Object> args) throws Exception { 
+        String argsJson = new Gson().toJson(args);
+        return _request("POST", "get_network_fee_estimate", argsJson);
+    }
+    public Map<String, Object> ArchiveAddress(Map<String, Object> args) throws Exception { 
+        String argsJson = new Gson().toJson(args);
+        return _request("POST", "archive_address", argsJson);
+    }
+    public Map<String, Object> UnarchiveAddress(Map<String, Object> args) throws Exception { 
+        String argsJson = new Gson().toJson(args);
+        return _request("POST", "unarchive_address", argsJson);
+    }
+    public Map<String, Object> GetMyArchivedAddresses(Map<String, Object> args) throws Exception { 
+        String argsJson = new Gson().toJson(args);
+        return _request("POST", "get_my_archived_addresses", argsJson);
+    }
+    public Map<String, Object> ArchiveDtrustAddress(Map<String, Object> args) throws Exception { 
+        String argsJson = new Gson().toJson(args);
+        return _request("POST", "archive_dtrust_address", argsJson);
+    }
+    public Map<String, Object> UnarchiveDtrustAddress(Map<String, Object> args) throws Exception { 
+        String argsJson = new Gson().toJson(args);
+        return _request("POST", "unarchive_dtrust_address", argsJson);
+    }
+    public Map<String, Object> GetMyArchivedDtrustAddresses(Map<String, Object> args) throws Exception { 
+        String argsJson = new Gson().toJson(args);
+        return _request("POST", "get_my_archived_dtrust_addresses", argsJson);
+    }
+    public Map<String, Object> GetDtrustNetworkFeeEstimate(Map<String, Object> args) throws Exception { 
+        String argsJson = new Gson().toJson(args);
+        return _request("POST", "get_dtrust_network_fee_estimate", argsJson);
+    }
+    public Map<String, Object> CreateNotification(Map<String, Object> args) throws Exception { 
+        String argsJson = new Gson().toJson(args);
+        return _request("POST", "create_notification", argsJson);
+    }
+    public Map<String, Object> DisableNotification(Map<String, Object> args) throws Exception { 
+        String argsJson = new Gson().toJson(args);
+        return _request("POST", "disable_notification", argsJson);
+    }
+    public Map<String, Object> EnableNotification(Map<String, Object> args) throws Exception { 
+        String argsJson = new Gson().toJson(args);
+        return _request("POST", "enable_notification", argsJson);
+    }
+    public Map<String, Object> GetNotifications(Map<String, Object> args) throws Exception { 
+        String argsJson = new Gson().toJson(args);
+        return _request("POST", "get_notifications", argsJson);
+    }
+    public Map<String, Object> GetRecentNotificationEvents(Map<String, Object> args) throws Exception { 
+        String argsJson = new Gson().toJson(args);
+        return _request("POST", "get_recent_notification_events", argsJson);
+    }
+    public Map<String, Object> DeleteNotification(Map<String, Object> args) throws Exception { 
+        String argsJson = new Gson().toJson(args);
+        return _request("POST", "delete_notification", argsJson);
+    }
+    public Map<String, Object> ValidateApiKey(Map<String, Object> args) throws Exception { 
+        String argsJson = new Gson().toJson(args);
+        return _request("POST", "validate_api_key", argsJson);
+    }
+    public Map<String, Object> SignTransation(Map<String, Object> args) throws Exception { 
+        String argsJson = new Gson().toJson(args);
+        return _request("POST", "sign_transaction", argsJson);
+    }
+    public Map<String, Object> FinalizeTransaction(Map<String, Object> args) throws Exception { 
+        String argsJson = new Gson().toJson(args);
+        return _request("POST", "finalize_transaction", argsJson);
+    }
+    public Map<String, Object> GetMyAddressesWithoutBalances(Map<String, Object> args) throws Exception { 
+        String argsJson = new Gson().toJson(args);
+        return _request("POST", "get_my_addresses_without_balances", argsJson);
+    }
+    public Map<String, Object> GetRawTransaction(Map<String, Object> args) throws Exception { 
+        String argsJson = new Gson().toJson(args);
+        return _request("POST", "get_raw_transaction", argsJson);
+    }
+    public Map<String, Object> GetDtrustBalance(Map<String, Object> args) throws Exception { 
+        String argsJson = new Gson().toJson(args);
+        return _request("POST", "get_dtrust_balance", argsJson);
+    }
+    public Map<String, Object> ArchiveAddresses(Map<String, Object> args) throws Exception { 
+        String argsJson = new Gson().toJson(args);
+        return _request("POST", "archive_addresses", argsJson);
+    }
+    public Map<String, Object> UnarchiveAddresses(Map<String, Object> args) throws Exception { 
+        String argsJson = new Gson().toJson(args);
+        return _request("POST", "unarchive_addresses", argsJson);
+    }
+    public Map<String, Object> ArchiveDtrustAddresses(Map<String, Object> args) throws Exception { 
+        String argsJson = new Gson().toJson(args);
+        return _request("POST", "archive_dtrust_addresses", argsJson);
+    }
+    public Map<String, Object> UnarchiveDtrustAddresses(Map<String, Object> args) throws Exception { 
+        String argsJson = new Gson().toJson(args);
+        return _request("POST", "unarchive_dtrust_addresses", argsJson);
+    }
+    public Map<String, Object> IsValidAddress(Map<String, Object> args) throws Exception { 
+        String argsJson = new Gson().toJson(args);
+        return _request("POST", "is_valid_address", argsJson);
+    }
+    public Map<String, Object> GetCurrentPrice(Map<String, Object> args) throws Exception { 
+        String argsJson = new Gson().toJson(args);
+        return _request("POST", "get_current_price", argsJson);
+    }
+    public Map<String, Object> GetAccountInfo(Map<String, Object> args) throws Exception { 
+        String argsJson = new Gson().toJson(args);
+        return _request("POST", "get_account_info", argsJson);
+    }
 
     //Withdrawal Methods
 
-    public Map<String, Object> Withdraw(String args) throws Exception { return _withdraw("POST", "withdraw", args); }
-    public Map<String, Object> WithdrawFromUser(String args) throws Exception { return _withdraw("POST", "withdraw_from_user", args); }
-    public Map<String, Object> WithdrawFromLabel(String args) throws Exception { return _withdraw("POST", "withdraw_from_label", args); }
-    public Map<String, Object> WithdrawFromAddress(String args) throws Exception { return _withdraw("POST", "withdraw_from_address", args); }
-    public Map<String, Object> WithdrawFromLabels(String args) throws Exception { return _withdraw("POST", "withdraw_from_labels", args); }
-    public Map<String, Object> WithdrawFromAddresses(String args) throws Exception { return _withdraw("POST", "withdraw_from_addresses", args); }
-    public Map<String, Object> WithdrawFromUsers(String args) throws Exception { return _withdraw("POST", "withdraw_from_users", args); }
-    public Map<String, Object> WithdrawFromDtrustAddress(String args) throws Exception { return _withdraw("POST", "withdraw_from_dtrust_address", args); }
-    public Map<String, Object> WithdrawFromDtrustAddresses(String args) throws Exception { return _withdraw("POST", "withdraw_from_dtrust_addresses", args); }
-    public Map<String, Object> WithdrawFromDtrustLabels(String args) throws Exception { return _withdraw("POST", "withdraw_from_dtrust_labels", args); }
+    public Map<String, Object> Withdraw(Map<String, Object> args) throws Exception { return _withdraw("POST", "withdraw", args); }
+    public Map<String, Object> WithdrawFromUser(Map<String, Object> args) throws Exception { return _withdraw("POST", "withdraw_from_user", args); }
+    public Map<String, Object> WithdrawFromLabel(Map<String, Object> args) throws Exception { return _withdraw("POST", "withdraw_from_label", args); }
+    public Map<String, Object> WithdrawFromAddress(Map<String, Object> args) throws Exception { return _withdraw("POST", "withdraw_from_address", args); }
+    public Map<String, Object> WithdrawFromLabels(Map<String, Object> args) throws Exception { return _withdraw("POST", "withdraw_from_labels", args); }
+    public Map<String, Object> WithdrawFromAddresses(Map<String, Object> args) throws Exception { return _withdraw("POST", "withdraw_from_addresses", args); }
+    public Map<String, Object> WithdrawFromUsers(Map<String, Object> args) throws Exception { return _withdraw("POST", "withdraw_from_users", args); }
+    public Map<String, Object> WithdrawFromDtrustAddress(Map<String, Object> args) throws Exception { return _withdraw("POST", "withdraw_from_dtrust_address", args); }
+    public Map<String, Object> WithdrawFromDtrustAddresses(Map<String, Object> args) throws Exception { return _withdraw("POST", "withdraw_from_dtrust_addresses", args); }
+    public Map<String, Object> WithdrawFromDtrustLabels(Map<String, Object> args) throws Exception { return _withdraw("POST", "withdraw_from_dtrust_labels", args); }
 
     //Sweeep Method
 
-    public Map<String, Object> SweepFromAddress(String args) throws Exception { return _sweep("POST", "sweep_from_address", args); }
+    public Map<String, Object> SweepFromAddress(Map<String, Object> args) throws Exception { return _sweep("POST", "sweep_from_address", args); }
 }
