@@ -15,7 +15,7 @@ public class BlockIo {
     private OkHttpClient RestClient;
     private String ApiUrl;
 
-    private Map<String, Object> Options;
+    private Options Opts;
     private String ApiKey;
     private int Version;
     private String Server;
@@ -28,56 +28,34 @@ public class BlockIo {
     private String DefaultPort = "";
     private String Host = "block.io";
 
-    public BlockIo(String config) throws UnsupportedEncodingException {
-        this(config, null, 2, "{}");
+    public BlockIo(String apiKey) throws UnsupportedEncodingException {
+        this(apiKey, null, 2, new Options());
     }
 
-    public BlockIo(String config, String pin) throws UnsupportedEncodingException {
-        this(config, pin, 2, "{}");
+    public BlockIo(String apiKey, String pin) throws UnsupportedEncodingException {
+        this(apiKey, pin, 2, new Options());
     }
 
-    public BlockIo(String config, String pin, int version) throws UnsupportedEncodingException {
-        this(config, pin, version, "{}");
+    public BlockIo(String apiKey, String pin, int version) throws UnsupportedEncodingException {
+        this(apiKey, pin, version, new Options());
     }
 
-    public BlockIo(String config, String pin, int version, String options ) throws UnsupportedEncodingException {
-        Options = JsonUtils.parseJson(options);
-        Options.put("allowNoPin", false);
+    public BlockIo(String apiKey, String pin, int version, Options opts ) throws UnsupportedEncodingException {
+        Opts = opts;
         Pin = pin == null || pin.equals("") ? null : pin;
         AesKey = null;
         ApiUrl = null;
-        Map<String, Object> ConfigObj;
 
-        if(JsonUtils.isJson(config)){
-            ConfigObj = JsonUtils.parseJson(config);
-            ApiKey = ConfigObj.get("api_key").toString();
-            if (ConfigObj.get("version") != null) this.Version = (int) Math.round((double)ConfigObj.get("version")); else this.Version = this.DefaultVersion;
-            if (ConfigObj.get("server") != null) this.Server = ConfigObj.get("server").toString(); else this.Server = this.DefaultServer;
-            if (ConfigObj.get("port") != null) this.Port = ConfigObj.get("port").toString(); else this.Port = this.DefaultPort;
-
-            if(ConfigObj.get("pin") != null)
-            {
-                this.Pin = ConfigObj.get("pin").toString();
-                this.AesKey = Helper.pinToAesKey(this.Pin);
-            }
-            if(ConfigObj.get("options") != null)
-            {
-                this.Options = JsonUtils.parseJson(ConfigObj.get("options").toString());
-                this.Options.put("allowNoPin", false);
-            }
-
-        } else{
-            ApiKey = config;
-            if(Version == -1) Version = DefaultVersion; else Version = version;
-            Server = DefaultServer;
-            Port = DefaultPort;
-            if(Pin != null){
-                Pin = pin;
-                AesKey = Helper.pinToAesKey(Pin);
-            }
+        ApiKey = apiKey;
+        Version = version;
+        Server = DefaultServer;
+        Port = DefaultPort;
+        if(Pin != null){
+            AesKey = Helper.pinToAesKey(Pin);
         }
-        if(Options.get("api_url") != null) {
-            ApiUrl = Options.get("api_url").toString() + "/api/v2";
+
+        if(Opts.getApiUrl() != "") {
+            ApiUrl = Opts.getApiUrl() + "/api/v2";
         }
         String serverString = !Server.equals("") ? Server + "." : Server;
         String portString = !Port.equals("") ? ":" + Port : Port;
@@ -106,7 +84,7 @@ public class BlockIo {
                 pojo.getEncryptedPassphrase().getPassphrase() == null)
             return res;
         if(pin == null) {
-            if(Options.get("allowNoPin").toString().equals("true")){
+            if(Opts.isAllowNoPin()){
                 return res;
             }
             throw new Exception("Public key mismatch. Invalid Secret PIN detected");

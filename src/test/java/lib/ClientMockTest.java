@@ -142,20 +142,21 @@ class ClientMockTest {
     @Test
     void Withdraw() throws Exception {
         String pin = "blockiotestpininsecure";
-        blockIo = new BlockIo(api_key, pin, 2, "{\"api_url\": \"http://localhost:8080\"}");
+
+        blockIo = new BlockIo(api_key, pin, 2, new Options("http://localhost:8080"));
         Map<String, Object> response = blockIo.Withdraw(new Gson().toJson(withdrawRequestBodyContent));
         assertNotNull(response.get("txid"));
     }
     @Test
     void Sweep() throws Exception {
-        blockIo = new BlockIo(api_key, null, 2, "{\"api_url\": \"http://localhost:8080\"}");
+        blockIo = new BlockIo(api_key, null, 2, new Options("http://localhost:8080"));
         Map<String, Object> response = blockIo.SweepFromAddress(new Gson().toJson(sweepRequestBodyContent));
         assertNotNull(response.get("txid"));
     }
     @Test
     void Dtrust() throws Exception {
         String pin = "blockiotestpininsecure";
-        blockIo = new BlockIo(api_key, pin, 2, "{\"api_url\": \"http://localhost:8080\"}");
+        blockIo = new BlockIo(api_key, pin, 2, new Options("http://localhost:8080"));
         Map<String, Object> response = blockIo.WithdrawFromDtrustAddress(new Gson().toJson(dTrustRequestBodyContent));
         assertNotNull(response);
     }
