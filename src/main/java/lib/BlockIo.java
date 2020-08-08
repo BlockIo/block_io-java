@@ -9,6 +9,7 @@ import org.bitcoinj.core.ECKey;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
 
 public class BlockIo {
@@ -72,15 +73,14 @@ public class BlockIo {
 
     private Map<String, Object> _withdraw(String method, String path, Map<String, Object> args) throws Exception {
         Map<String, Object> res = null;
-        Map<String, Object> argsObj = args;
 
         String pin = Pin;
-        if(argsObj.get("pin") != null) {
-            pin = argsObj.get("pin").toString();
-            argsObj.put("pin", null);
+        if(args.get("pin") != null) {
+            pin = args.get("pin").toString();
+            args.put("pin", null);
         }
 
-        res = _request(method, path, new Gson().toJson(argsObj));
+        res = _request(method, path, new Gson().toJson(args));
         JsonElement jsonElement = new Gson().toJsonTree(res);
         SignatureJson pojo = new Gson().fromJson(jsonElement, SignatureJson.class);
         if(pojo.getReferenceId() == null || pojo.getEncryptedPassphrase() == null ||
@@ -111,16 +111,16 @@ public class BlockIo {
     private Map<String, Object> _sweep(String method, String path, Map<String, Object> args) throws Exception {
         ECKey keyFromWif = null;
         Map<String, Object> res = null;
-        Map<String, Object> argsObj = args;
+        Map<String, Object> mutableMap = new HashMap<>(args);
 
-        if(argsObj.get("to_address") == null){
+        if(mutableMap.get("to_address") == null){
             throw new Exception("Missing mandatory private_key argument.");
         }
-        String privKeyStr = argsObj.get("private_key").toString();
+        String privKeyStr = mutableMap.get("private_key").toString();
         keyFromWif = Key.fromWif(privKeyStr);
-        argsObj.put("public_key", keyFromWif.getPublicKeyAsHex());
-        argsObj.put("private_key", "");
-        res = _request(method, path, new Gson().toJson(argsObj));
+        mutableMap.put("public_key", keyFromWif.getPublicKeyAsHex());
+        mutableMap.put("private_key", "");
+        res = _request(method, path, new Gson().toJson(mutableMap));
         JsonElement jsonElement = new Gson().toJsonTree(res);
         SignatureJson pojo = new Gson().fromJson(jsonElement, SignatureJson.class);
         if(pojo.getReferenceId() == null) {
