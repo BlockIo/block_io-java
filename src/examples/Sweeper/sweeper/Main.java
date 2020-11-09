@@ -1,24 +1,20 @@
-package examples;
+package sweeper;
 
 import lib.BlockIo;
 import io.github.cdimascio.dotenv.Dotenv;
 import java.io.UnsupportedEncodingException;
 import java.util.Map;
 
-public class Sweeper {
-    private final BlockIo blockIo;
-    private final Dotenv dotenv;
+public class Main {
 
-    public Sweeper() throws UnsupportedEncodingException {
+    public static void main(String[] args) throws Exception {
+        final BlockIo blockIo;
+        final Dotenv dotenv;
         dotenv = Dotenv.load();
         blockIo = new BlockIo(dotenv.get("API_KEY"));
-    }
-
-    public void RunSweeperExample() throws Exception {
-
         if((dotenv.get("TO_ADDRESS").equals("") || dotenv.get("TO_ADDRESS") == null) ||
-            (dotenv.get("PRIVATE_KEY_FROM_ADDRESS").equals("") || dotenv.get("PRIVATE_KEY_FROM_ADDRESS") == null) ||
-            (dotenv.get("FROM_ADDRESS").equals("") || dotenv.get("FROM_ADDRESS") == null)){
+                (dotenv.get("PRIVATE_KEY_FROM_ADDRESS").equals("") || dotenv.get("PRIVATE_KEY_FROM_ADDRESS") == null) ||
+                (dotenv.get("FROM_ADDRESS").equals("") || dotenv.get("FROM_ADDRESS") == null)){
 
             throw new Exception("Error: Missing parameters from env.");
         }
