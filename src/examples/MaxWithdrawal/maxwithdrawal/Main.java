@@ -1,4 +1,4 @@
-package examples;
+package maxwithdrawal;
 
 import com.google.gson.Gson;
 import lib.*;
@@ -8,16 +8,14 @@ import java.io.UnsupportedEncodingException;
 import java.util.Map;
 import java.util.Objects;
 
-public class MaxWithdrawal {
-    private final BlockIo blockIo;
-    private final Dotenv dotenv;
+public class Main {
 
-    public MaxWithdrawal() throws UnsupportedEncodingException {
-        dotenv = Dotenv.load();
+    public static void main(String[] args) throws Exception {
+        final Dotenv dotenv = Dotenv.load();
+        final BlockIo blockIo;
+
         blockIo = new BlockIo(dotenv.get("API_KEY"), dotenv.get("PIN"));
-    }
 
-    public void RunMaxWithdrawalExample() throws Exception {
         String balance = blockIo.GetBalance(null).get("available_balance").toString();
 
         System.out.println("Balance: " + balance);

@@ -1,4 +1,4 @@
-package examples;
+package drust;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
@@ -6,22 +6,18 @@ import lib.*;
 import io.github.cdimascio.dotenv.Dotenv;
 import org.bitcoinj.core.ECKey;
 
-import java.io.UnsupportedEncodingException;
-import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
-public class DTrust {
-    private final BlockIo blockIo;
-    String DtrustAddress;
-    String DtrustAddressLabel;
-    List<String> PublicKeys;
-    List<ECKey> PrivKeys;
+public class Main {
 
-    public DTrust() throws UnsupportedEncodingException, NoSuchAlgorithmException {
+    public static void main(String[] args) throws Exception {
 
         Dotenv dotenv = Dotenv.load();
-
-        DtrustAddress = null;
+        final BlockIo blockIo;
+        String DtrustAddress;
+        String DtrustAddressLabel;
+        List<String> PublicKeys;
+        List<ECKey> PrivKeys;
         DtrustAddressLabel = "dTrust1_witness_v0";
         blockIo = new BlockIo(dotenv.get("API_KEY"), dotenv.get("PIN"));
 
@@ -42,9 +38,6 @@ public class DTrust {
                 add(PrivKeys.get(3).getPublicKeyAsHex());
             }
         };
-    }
-
-    public void RunDtrustExample() throws Exception {
 
         String signers = String.join(",", PublicKeys);
         Map<String, Object> res = blockIo.GetNewDtrustAddress(Map.of("label", DtrustAddressLabel, "public_keys", signers, "required_signatures", "3", "address_type", "witness_v0" ));
