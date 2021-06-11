@@ -4,17 +4,11 @@ import com.google.common.collect.ImmutableList;
 import org.bitcoinj.core.*;
 import org.bitcoinj.script.Script;
 import org.bitcoinj.script.ScriptBuilder;
-import org.bitcoinj.script.ScriptChunk;
 import org.bouncycastle.util.encoders.Hex;
-import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.libdohj.params.LitecoinTestNet3Params;
 
-import java.util.*;
-
-import static org.bitcoinj.script.ScriptOpCodes.OP_EQUAL;
-import static org.bitcoinj.script.ScriptOpCodes.OP_HASH160;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class AddressTest {
@@ -66,9 +60,9 @@ public class AddressTest {
     {
         //failing
         Script redeemScript = ScriptBuilder.createMultiSigOutputScript(2, ImmutableList.of(privKey1, privKey2));
-        Script p2shMultiSig = ScriptBuilder.createP2SHOutputScript(redeemScript);
+        Script p2shScript = ScriptBuilder.createP2SHOutputScript(redeemScript);
 
-        Address p2shAddr = p2shMultiSig.getToAddress(networkParams);
+        Address p2shAddr = p2shScript.getToAddress(networkParams);
 
         assertEquals(p2shAddr.toString(), "QPZMy7ivpYdkJRLhtTx7tj5Fa4doQ2auWk");
     }
@@ -76,9 +70,11 @@ public class AddressTest {
     @Test
     public void TestP2WPKHOverP2SHAddress()
     {
+        // pubkeyHash of script is the same as hash of an address
         //failing
-        Address p2wpkhAddr = Address.fromKey(networkParams, privKey1, Script.ScriptType.P2WPKH);
-        Script p2shWrappedScript = ScriptBuilder.createP2SHOutputScript(p2wpkhAddr.getHash());
+        Script p2wpkhScript = ScriptBuilder.createP2WPKHOutputScript(privKey1);
+
+        Script p2shWrappedScript = ScriptBuilder.createP2SHOutputScript(p2wpkhScript);
         Address test = p2shWrappedScript.getToAddress(networkParams);
 
         assertEquals(test.toString(), "Qgn9vENxxnNCPun8CN6KR1PPB7WCo9oxqc");
@@ -91,10 +87,10 @@ public class AddressTest {
         Script redeemScript = ScriptBuilder.createMultiSigOutputScript(2, ImmutableList.of(privKey1, privKey2));
         Script p2wshScript = ScriptBuilder.createP2WSHOutputScript(redeemScript);
 
-        byte[] hash = Utils.sha256hash160(p2wshScript.getProgram());
-        Script p2shWrapped = ScriptBuilder.createP2SHOutputScript(hash);
+        Script p2shWrapped = ScriptBuilder.createP2SHOutputScript(p2wshScript);
 
         Address addr = p2shWrapped.getToAddress(networkParams);
+
         assertEquals(addr.toString(), "QeyxkrKbgKvxbBY1HLiBYjMnZx1HDRMYmd");
     }
 }
