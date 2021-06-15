@@ -2,6 +2,7 @@ package lib;
 
 import org.bitcoinj.core.ECKey;
 import org.bitcoinj.core.Sha256Hash;
+import org.bitcoinj.core.Transaction;
 import org.bitcoinj.core.Utils;
 import org.bouncycastle.crypto.digests.SHA256Digest;
 import org.bouncycastle.crypto.generators.PKCS5S2ParametersGenerator;
@@ -83,5 +84,9 @@ public class Helper {
             return Utils.HEX.encode(byteSignedData);
         }
         return null;
+    }
+
+    public static String txToHexString(Transaction tx){
+        return Utils.HEX.encode(tx.unsafeBitcoinSerialize());
     }
 }
