@@ -10,7 +10,7 @@
     <repositories>
         <repository>
             <id>jitpack.io</id>
-            <url>https://jitpack.io</url>
+            <url>https://www.jitpack.io</url>
         </repository>
     </repositories>
     <build>
@@ -78,7 +78,7 @@
 <!--            <version>0.15.9</version>-->
             <groupId>com.github.nwasiq</groupId>
             <artifactId>libdohj</artifactId>
-            <version>901d751ef92ccae924fa9d3154adcccdfb54dd12</version>
+            <version>572a6192fac6805bd12c500de67bcbb7eab19bcc</version>
         </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>
