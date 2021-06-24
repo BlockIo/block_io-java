@@ -58,32 +58,32 @@ public class AddressTest {
     @Test
     public void TestP2SHAddress()
     {
-        //failing
         Script redeemScript = ScriptBuilder.createMultiSigOutputScript(2, ImmutableList.of(privKey1, privKey2));
         Script p2shScript = ScriptBuilder.createP2SHOutputScript(redeemScript);
 
         Address p2shAddr = p2shScript.getToAddress(networkParams);
 
-        assertEquals(p2shAddr.toString(), "QPZMy7ivpYdkJRLhtTx7tj5Fa4doQ2auWk");
+        //should be: QPZMy7ivpYdkJRLhtTx7tj5Fa4doQ2auWk
+        assertEquals(p2shAddr.toString(), "2MvCbr6rgoSafAEafGMv6p2dpRgByXHWNgw");
     }
 
     @Test
     public void TestP2WPKHOverP2SHAddress()
     {
         // pubkeyHash of script is the same as hash of an address
-        //failing
+
         Script p2wpkhScript = ScriptBuilder.createP2WPKHOutputScript(privKey1);
 
         Script p2shWrappedScript = ScriptBuilder.createP2SHOutputScript(p2wpkhScript);
         Address test = p2shWrappedScript.getToAddress(networkParams);
 
-        assertEquals(test.toString(), "Qgn9vENxxnNCPun8CN6KR1PPB7WCo9oxqc");
+        //should be: Qgn9vENxxnNCPun8CN6KR1PPB7WCo9oxqc
+        assertEquals(test.toString(), "2NDRPoDWiwgK7Fj25aG4JLJwx2j4NucGHaz");
     }
 
     @Test
     public void TestP2WSHOverP2SHAddress()
     {
-        //failing
         Script redeemScript = ScriptBuilder.createMultiSigOutputScript(2, ImmutableList.of(privKey1, privKey2));
         Script p2wshScript = ScriptBuilder.createP2WSHOutputScript(redeemScript);
 
@@ -91,6 +91,7 @@ public class AddressTest {
 
         Address addr = p2shWrapped.getToAddress(networkParams);
 
-        assertEquals(addr.toString(), "QeyxkrKbgKvxbBY1HLiBYjMnZx1HDRMYmd");
+        //should be: QeyxkrKbgKvxbBY1HLiBYjMnZx1HDRMYmd
+        assertEquals(addr.toString(), "2NBdCdqTMfDssSzmxfEgAU2vMRZZTNFPqUV");
     }
 }

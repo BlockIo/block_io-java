@@ -173,4 +173,71 @@ public class TransactionTest {
         assertEquals(Helper.txToHexString(newTx), "01000000000101e6195346d5c118b140eec5744821890269df2e309f2645fa2dc7c48b129148d10000000000ffffffff01c02d9a3b0000000017a914dd4edd1406541e476450fda7924720fe19f337b9870400483045022100b6b658f7d3d592645cdc7ca21d45504ffde7d9b2ef22e97b7b57c507e952b006022059631267d3fcdfb06a4efdf940dabaf022e051bda9d93de2ef400e94ea2b39be01473044022033d8136791bc5658700b385ca5728b9e188a3ba1aa3bc691d6adfd1b8431cee6022073d565e5d1e96c0257f7cefdab946e48fb3857248f49048e00f6b701e97457c30147522103820317ad251bca573c8fda2b8f26ffc9aae9d5ecb15b50ee08d8f9e009def38e210238de8c9eb2842ecaf0cc61ee6ba23fe4e46f1cfd82eac0910e1d8e865bd76df952ae00000000");
         assertEquals(newTx.getTxId().toString(), "d76dd93d5afbc8cb3bfd487445fac9f81d7ae409723990f7744f398feae9c0e4");
     }
+
+    @Test
+    public void TestTransactionP2WPKHOverP2SHToP2PKH() throws IOException {
+        String prevTxId = "d76dd93d5afbc8cb3bfd487445fac9f81d7ae409723990f7744f398feae9c0e4";
+        long inputValue = preOutputValue - fee - fee - fee - fee;
+        long outputValue = inputValue - fee;
+        Script redeemScript = ScriptBuilder.createP2WPKHOutputScript(privKey1);
+        Script witnessScript = ScriptBuilder.createP2PKHOutputScript(privKey1);
+
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        output.write((byte)0);
+        output.write((byte)20);
+        output.write(redeemScript.getPubKeyHash());
+        byte[] out = output.toByteArray();
+
+        Script p2wpkhScript = new ScriptBuilder().data(out).build();
+
+        Address toAddr = Address.fromString(networkParams, "mwop54ocwGjeErSTLCKgKxrdYp1k9o6Cgk");
+
+        Transaction newTx = new Transaction(networkParams);
+        newTx.addInput(Sha256Hash.wrap(prevTxId), 0, redeemScript).clearScriptBytes();
+        newTx.addOutput(Coin.valueOf(outputValue), toAddr);
+
+        assertEquals(Helper.txToHexString(newTx), "0100000001e4c0e9ea8f394f74f790397209e47a1df8c9fa457448fd3bcbc8fb5a3dd96dd70000000000ffffffff01b0069a3b000000001976a914b2b2380a1e486aff5ae5ae74c892e902a72c0a4c88ac00000000");
+
+        Sha256Hash sigHash = newTx.hashForWitnessSignature(0, witnessScript, Coin.valueOf(inputValue), Transaction.SigHash.ALL, false);
+        assertEquals(sigHash.toString(), "59e2322a152dbad2c283232bd098a55c61bc0cd324dfd85311a0a9e73053d46b");
+
+        ECKey.ECDSASignature sig1 = privKey1.sign(sigHash);
+        TransactionSignature txSig = new TransactionSignature(sig1, Transaction.SigHash.ALL, false);
+
+        newTx.getInput(0).setScriptSig(p2wpkhScript);
+        newTx.getInput(0).setWitness(TransactionWitness.redeemP2WPKH(txSig, privKey1));
+
+        assertEquals(Helper.txToHexString(newTx), "01000000000101e4c0e9ea8f394f74f790397209e47a1df8c9fa457448fd3bcbc8fb5a3dd96dd70000000017160014b2b2380a1e486aff5ae5ae74c892e902a72c0a4cffffffff01b0069a3b000000001976a914b2b2380a1e486aff5ae5ae74c892e902a72c0a4c88ac02473044022067efbe904404b388bf11cf8af610f2efa95ac943a67071c3c5fe0332286d672e02205f3917d8967d7f32fb65c0808c6c0de7dda8a080bf92f80c1ee13d33757fd1df012103820317ad251bca573c8fda2b8f26ffc9aae9d5ecb15b50ee08d8f9e009def38e00000000");
+        assertEquals(newTx.getTxId().toString(), "74b178c39268acd0663c88d3a56665b2f5335b60711445a5f8cd8aa59c2c7d38");
+    }
+
+    @Test
+    public void TestTransactionP2PKHToP2SH() {
+        String prevTxId = "74b178c39268acd0663c88d3a56665b2f5335b60711445a5f8cd8aa59c2c7d38";
+        long inputValue = preOutputValue - fee - fee - fee - fee - fee;
+        long outputValue = inputValue - fee;
+
+        Script redeemScript = ScriptBuilder.createP2PKHOutputScript(privKey1);
+
+        Address toAddr = Address.fromString(networkParams, "2MvCbr6rgoSafAEafGMv6p2dpRgByXHWNgw");
+
+        Transaction newTx = new Transaction(networkParams);
+        newTx.addInput(Sha256Hash.wrap(prevTxId), 0, redeemScript).clearScriptBytes();
+        newTx.addOutput(Coin.valueOf(outputValue), toAddr);
+
+        assertEquals(Helper.txToHexString(newTx), "0100000001387d2c9ca58acdf8a5451471605b33f5b26566a5d3883c66d0ac6892c378b1740000000000ffffffff01a0df993b0000000017a9142069605a7742286aef950b68ae7818f7294e876c8700000000");
+
+        Sha256Hash sigHash = newTx.hashForSignature(0, redeemScript, Transaction.SigHash.ALL, false);
+        assertEquals(sigHash.toString(), "ae52a447200543a0e5a5ca8de0bad10eebb411748d137f7b2fba380b98ea6651");
+
+        ECKey.ECDSASignature sig1 = privKey1.sign(sigHash);
+        TransactionSignature txSig = new TransactionSignature(sig1, Transaction.SigHash.ALL, false);
+
+        Script inputScript = ScriptBuilder.createInputScript(txSig, privKey1);
+
+        newTx.getInput(0).setScriptSig(inputScript);
+
+        assertEquals(Helper.txToHexString(newTx), "0100000001387d2c9ca58acdf8a5451471605b33f5b26566a5d3883c66d0ac6892c378b174000000006b483045022100ff4e36c565f31768ffba7eebdb7c9e0384cfcac1fa6a91d11cbded10873100b002206de5452115e1cc7a3baecd786a04b5f0b533b7b6cee5b05f4cc60f92bc993e7a012103820317ad251bca573c8fda2b8f26ffc9aae9d5ecb15b50ee08d8f9e009def38effffffff01a0df993b0000000017a9142069605a7742286aef950b68ae7818f7294e876c8700000000");
+        assertEquals(newTx.getTxId().toString(), "64e1ad990d0e6a50485f39ebb9e98db96cba420bd1eaca6350543f2385e54e62");
+    }
 }
