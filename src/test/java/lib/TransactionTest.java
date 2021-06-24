@@ -90,46 +90,42 @@ public class TransactionTest {
 
     @Test
     public void TestTransactionP2WSHOverP2SHToP2WPKH() {
-        Address fromAddr = Address.fromString(networkParams, "2NBdCdqTMfDssSzmxfEgAU2vMRZZTNFPqUV");
         Address toAddr = Address.fromString(networkParams, "tltc1qk2erszs7fp407kh94e6v3yhfq2njczjvg4hnz6");
 
         Script redeemScript = ScriptBuilder.createMultiSigOutputScript(2, ImmutableList.of(privKey1, privKey2));
         Script p2wshScript = ScriptBuilder.createP2WSHOutputScript(redeemScript);
 
-        Script p2shWrapped = ScriptBuilder.createP2SHOutputScript(p2wshScript);
-
         long prevOutputValue = 1000000000 - fee;
         long outputValue = prevOutputValue - fee;
 
         Transaction newTx = new Transaction(networkParams);
-        newTx.addInput(Sha256Hash.wrap("2464c6122378ee5ed9a42d5192e15713b107924d05d15b58254eb7b2030118c7"), 0, p2shWrapped).clearScriptBytes();
+        newTx.addInput(Sha256Hash.wrap("2464c6122378ee5ed9a42d5192e15713b107924d05d15b58254eb7b2030118c7"), 0, p2wshScript).clearScriptBytes();
         newTx.addOutput(Coin.valueOf(outputValue), toAddr);
 
         assertEquals(Helper.txToHexString(newTx), "0100000001c7180103b2b74e25585bd1054d9207b11357e192512da4d95eee782312c664240000000000ffffffff01e07b9a3b00000000160014b2b2380a1e486aff5ae5ae74c892e902a72c0a4c00000000");
 
-        Sha256Hash sigHash = newTx.hashForWitnessSignature(0, p2shWrapped,  newTx.getOutputSum(), Transaction.SigHash.ALL, false);
-//        assertEquals(sigHash.toString(), "e1c684f769c0e186be215ece3b7c1f3f23985ecbafafe0c8d43936fcd79eafdc");
+        Sha256Hash sigHash = newTx.hashForWitnessSignature(0, redeemScript,  Coin.valueOf(prevOutputValue), Transaction.SigHash.ALL, false);
+        assertEquals(sigHash.toString(), "e1c684f769c0e186be215ece3b7c1f3f23985ecbafafe0c8d43936fcd79eafdc");
 
-        Sha256Hash testHash = Sha256Hash.wrap("e1c684f769c0e186be215ece3b7c1f3f23985ecbafafe0c8d43936fcd79eafdc");
-//        ECKey.ECDSASignature sig1 = privKey1.sign(testHash);
-//        ECKey.ECDSASignature sig2 = privKey2.sign(testHash);
+        ECKey.ECDSASignature sig1 = privKey1.sign(sigHash);
+        ECKey.ECDSASignature sig2 = privKey2.sign(sigHash);
+
+        TransactionSignature txSig1 = new TransactionSignature(sig1, Transaction.SigHash.ALL, false);
+        TransactionSignature txSig2 = new TransactionSignature(sig2, Transaction.SigHash.ALL, false);
+
+        TransactionWitness wit = new TransactionWitness(4);
+        wit.setPush(0, new byte[0]);
+        wit.setPush(1, txSig1.encodeToDER());
+        wit.setPush(2, txSig2.encodeToDER());
+        wit.setPush(3, redeemScript.getProgram());
+
+        newTx.getInput(0).setScriptSig(p2wshScript);
+        newTx.getInput(0).setWitness(wit);
 ////
-        TransactionSignature sig1TransactionSignature = newTx.calculateWitnessSignature(0, privKey1, p2shWrapped, newTx.getOutputSum(), Transaction.SigHash.ALL, false);
-        TransactionSignature sig2TransactionSignature = newTx.calculateWitnessSignature(0, privKey2, p2shWrapped, newTx.getOutputSum(), Transaction.SigHash.ALL, false);
-
-        newTx.getInput(0).setWitness(TransactionWitness.redeemP2WPKH(sig1TransactionSignature, privKey1));
-        newTx.getInput(0).setWitness(TransactionWitness.redeemP2WPKH(sig2TransactionSignature, privKey2));
-        newTx.getInput(0).setScriptSig(p2shWrapped);
 
         System.out.println(Helper.txToHexString(newTx));
-////
-//        Script inputScript = ScriptBuilder.createMultiSigInputScript(ImmutableList.of(sig1TransactionSignature, sig2TransactionSignature));
-////
-//        TransactionWitness witness = TransactionWitness.EMPTY;
-//        witness.
-//        newTx.getInput(0).setScriptSig(inputScript);
-////
+
 //        assertEquals(Helper.txToHexString(newTx), "01000000000101c7180103b2b74e25585bd1054d9207b11357e192512da4d95eee782312c664240000000023220020d42b8341140559b7da105e8669e8f7d5a03773642ad82403ba91b80ffcc415deffffffff01e07b9a3b00000000160014b2b2380a1e486aff5ae5ae74c892e902a72c0a4c0400473044022067c9f8ed5c8f0770be1b7d44ade72c4d976a2b0e6c4df39ea70923daff26ea5e02205894350de5304d446343fbf95245cd656876a11c94025554bf878b3ecf90db720147304402204ee76a1814b3eb289e492409bd29ebb77088c9c20645c8a63c75bfe44eac41f70220232bcd35a0cc78e88dfa59dc15331023c3d3bb3a8b63e6b753c8ab4599b7bd290147522103820317ad251bca573c8fda2b8f26ffc9aae9d5ecb15b50ee08d8f9e009def38e210238de8c9eb2842ecaf0cc61ee6ba23fe4e46f1cfd82eac0910e1d8e865bd76df952ae00000000");
-//        assertEquals(newTx.getTxId().toString(), "754162225c3f2b8ce476d1df7a0b35f04ba6fe24fd6c0fd89e31c5e54d4eaec1");
+//        assertEquals(newTx.getTxId().toString(), "66a78d3cda988e4c90611b192ae5bd02e0fa70c08c3219110c02594802a42c01");
     }
 }
