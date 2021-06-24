@@ -6,7 +6,6 @@ import org.bitcoinj.core.Transaction;
 import org.bitcoinj.crypto.TransactionSignature;
 import org.bitcoinj.script.Script;
 import org.bitcoinj.script.ScriptBuilder;
-import org.bitcoinj.script.ScriptChunk;
 import org.bouncycastle.util.encoders.Hex;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -98,13 +97,7 @@ public class TransactionTest {
         Address toAddr = Address.fromString(networkParams, "tltc1qk2erszs7fp407kh94e6v3yhfq2njczjvg4hnz6");
 
         Script redeemScript = ScriptBuilder.createMultiSigOutputScript(2, ImmutableList.of(privKey1, privKey2));
-//        Script p2wshScript = ScriptBuilder.createP2WSHOutputScript(redeemScript);
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
-        output.write((byte)0);
-        output.write((byte)32);
-        output.write(Sha256Hash.hash(redeemScript.getProgram()));
-        byte[] out = output.toByteArray();
-        Script p2wshScript = new ScriptBuilder().data(out).build();
+        Script p2wshScript = Helper.createBlockIoP2WSHScript(redeemScript);
 
         long prevOutputValue = 1000000000 - fee;
         long outputValue = prevOutputValue - fee;
@@ -182,13 +175,7 @@ public class TransactionTest {
         Script redeemScript = ScriptBuilder.createP2WPKHOutputScript(privKey1);
         Script witnessScript = ScriptBuilder.createP2PKHOutputScript(privKey1);
 
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
-        output.write((byte)0);
-        output.write((byte)20);
-        output.write(redeemScript.getPubKeyHash());
-        byte[] out = output.toByteArray();
-
-        Script p2wpkhScript = new ScriptBuilder().data(out).build();
+        Script p2wpkhScript = Helper.createBlockIoP2WPKHScript(redeemScript);
 
         Address toAddr = Address.fromString(networkParams, "mwop54ocwGjeErSTLCKgKxrdYp1k9o6Cgk");
 

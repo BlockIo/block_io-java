@@ -4,12 +4,16 @@ import org.bitcoinj.core.ECKey;
 import org.bitcoinj.core.Sha256Hash;
 import org.bitcoinj.core.Transaction;
 import org.bitcoinj.core.Utils;
+import org.bitcoinj.script.Script;
+import org.bitcoinj.script.ScriptBuilder;
 import org.bouncycastle.crypto.digests.SHA256Digest;
 import org.bouncycastle.crypto.generators.PKCS5S2ParametersGenerator;
 import org.bouncycastle.crypto.params.KeyParameter;
 import org.bouncycastle.util.encoders.Hex;
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -88,5 +92,23 @@ public class Helper {
 
     public static String txToHexString(Transaction tx){
         return Utils.HEX.encode(tx.unsafeBitcoinSerialize());
+    }
+
+    public static Script createBlockIoP2WSHScript(Script redeem) throws IOException {
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        output.write((byte)0);
+        output.write((byte)32);
+        output.write(Sha256Hash.hash(redeem.getProgram()));
+        byte[] out = output.toByteArray();
+        return new ScriptBuilder().data(out).build();
+    }
+
+    public static Script createBlockIoP2WPKHScript(Script redeem) throws IOException {
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        output.write((byte)0);
+        output.write((byte)20);
+        output.write(redeem.getPubKeyHash());
+        byte[] out = output.toByteArray();
+        return new ScriptBuilder().data(out).build();
     }
 }
