@@ -6,10 +6,15 @@ import org.bitcoinj.core.Transaction;
 import org.bitcoinj.crypto.TransactionSignature;
 import org.bitcoinj.script.Script;
 import org.bitcoinj.script.ScriptBuilder;
+import org.bitcoinj.script.ScriptChunk;
 import org.bouncycastle.util.encoders.Hex;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.libdohj.params.LitecoinTestNet3Params;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TransactionTest {
@@ -89,11 +94,17 @@ public class TransactionTest {
     }
 
     @Test
-    public void TestTransactionP2WSHOverP2SHToP2WPKH() {
+    public void TestTransactionP2WSHOverP2SHToP2WPKH() throws IOException {
         Address toAddr = Address.fromString(networkParams, "tltc1qk2erszs7fp407kh94e6v3yhfq2njczjvg4hnz6");
 
         Script redeemScript = ScriptBuilder.createMultiSigOutputScript(2, ImmutableList.of(privKey1, privKey2));
-        Script p2wshScript = ScriptBuilder.createP2WSHOutputScript(redeemScript);
+//        Script p2wshScript = ScriptBuilder.createP2WSHOutputScript(redeemScript);
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        output.write((byte)0);
+        output.write((byte)32);
+        output.write(Sha256Hash.hash(redeemScript.getProgram()));
+        byte[] out = output.toByteArray();
+        Script p2wshScript = new ScriptBuilder().data(out).build();
 
         long prevOutputValue = 1000000000 - fee;
         long outputValue = prevOutputValue - fee;
@@ -115,17 +126,14 @@ public class TransactionTest {
 
         TransactionWitness wit = new TransactionWitness(4);
         wit.setPush(0, new byte[0]);
-        wit.setPush(1, txSig1.encodeToDER());
-        wit.setPush(2, txSig2.encodeToDER());
+        wit.setPush(1, txSig1.encodeToBitcoin());
+        wit.setPush(2, txSig2.encodeToBitcoin());
         wit.setPush(3, redeemScript.getProgram());
 
         newTx.getInput(0).setScriptSig(p2wshScript);
         newTx.getInput(0).setWitness(wit);
-////
 
-        System.out.println(Helper.txToHexString(newTx));
-
-//        assertEquals(Helper.txToHexString(newTx), "01000000000101c7180103b2b74e25585bd1054d9207b11357e192512da4d95eee782312c664240000000023220020d42b8341140559b7da105e8669e8f7d5a03773642ad82403ba91b80ffcc415deffffffff01e07b9a3b00000000160014b2b2380a1e486aff5ae5ae74c892e902a72c0a4c0400473044022067c9f8ed5c8f0770be1b7d44ade72c4d976a2b0e6c4df39ea70923daff26ea5e02205894350de5304d446343fbf95245cd656876a11c94025554bf878b3ecf90db720147304402204ee76a1814b3eb289e492409bd29ebb77088c9c20645c8a63c75bfe44eac41f70220232bcd35a0cc78e88dfa59dc15331023c3d3bb3a8b63e6b753c8ab4599b7bd290147522103820317ad251bca573c8fda2b8f26ffc9aae9d5ecb15b50ee08d8f9e009def38e210238de8c9eb2842ecaf0cc61ee6ba23fe4e46f1cfd82eac0910e1d8e865bd76df952ae00000000");
-//        assertEquals(newTx.getTxId().toString(), "66a78d3cda988e4c90611b192ae5bd02e0fa70c08c3219110c02594802a42c01");
+        assertEquals(Helper.txToHexString(newTx), "01000000000101c7180103b2b74e25585bd1054d9207b11357e192512da4d95eee782312c664240000000023220020d42b8341140559b7da105e8669e8f7d5a03773642ad82403ba91b80ffcc415deffffffff01e07b9a3b00000000160014b2b2380a1e486aff5ae5ae74c892e902a72c0a4c0400473044022067c9f8ed5c8f0770be1b7d44ade72c4d976a2b0e6c4df39ea70923daff26ea5e02205894350de5304d446343fbf95245cd656876a11c94025554bf878b3ecf90db720147304402204ee76a1814b3eb289e492409bd29ebb77088c9c20645c8a63c75bfe44eac41f70220232bcd35a0cc78e88dfa59dc15331023c3d3bb3a8b63e6b753c8ab4599b7bd290147522103820317ad251bca573c8fda2b8f26ffc9aae9d5ecb15b50ee08d8f9e009def38e210238de8c9eb2842ecaf0cc61ee6ba23fe4e46f1cfd82eac0910e1d8e865bd76df952ae00000000");
+        assertEquals(newTx.getTxId().toString(), "66a78d3cda988e4c90611b192ae5bd02e0fa70c08c3219110c02594802a42c01");
     }
 }
