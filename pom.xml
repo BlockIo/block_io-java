@@ -78,7 +78,7 @@
 <!--            <version>0.15.9</version>-->
             <groupId>com.github.nwasiq</groupId>
             <artifactId>libdohj</artifactId>
-            <version>572a6192fac6805bd12c500de67bcbb7eab19bcc</version>
+            <version>2bacfa4e9cdca405d6d3bec13f715cf2eb6587d6</version>
         </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>

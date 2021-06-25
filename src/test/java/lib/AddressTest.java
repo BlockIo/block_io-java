@@ -63,8 +63,7 @@ public class AddressTest {
 
         Address p2shAddr = p2shScript.getToAddress(networkParams);
 
-        //should be: QPZMy7ivpYdkJRLhtTx7tj5Fa4doQ2auWk
-        assertEquals(p2shAddr.toString(), "2MvCbr6rgoSafAEafGMv6p2dpRgByXHWNgw");
+        assertEquals(p2shAddr.toString(), "QPZMy7ivpYdkJRLhtTx7tj5Fa4doQ2auWk");
     }
 
     @Test
@@ -77,8 +76,7 @@ public class AddressTest {
         Script p2shWrappedScript = ScriptBuilder.createP2SHOutputScript(p2wpkhScript);
         Address test = p2shWrappedScript.getToAddress(networkParams);
 
-        //should be: Qgn9vENxxnNCPun8CN6KR1PPB7WCo9oxqc
-        assertEquals(test.toString(), "2NDRPoDWiwgK7Fj25aG4JLJwx2j4NucGHaz");
+        assertEquals(test.toString(), "Qgn9vENxxnNCPun8CN6KR1PPB7WCo9oxqc");
     }
 
     @Test
@@ -91,7 +89,6 @@ public class AddressTest {
 
         Address addr = p2shWrapped.getToAddress(networkParams);
 
-        //should be: QeyxkrKbgKvxbBY1HLiBYjMnZx1HDRMYmd
-        assertEquals(addr.toString(), "2NBdCdqTMfDssSzmxfEgAU2vMRZZTNFPqUV");
+        assertEquals(addr.toString(), "QeyxkrKbgKvxbBY1HLiBYjMnZx1HDRMYmd");
     }
 }

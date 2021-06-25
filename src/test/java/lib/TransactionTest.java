@@ -33,7 +33,7 @@ public class TransactionTest {
 
     @Test
     public void TestTransactionP2SHToP2WSHOverP2SH() {
-        Address toAddr = Address.fromString(networkParams, "2NBdCdqTMfDssSzmxfEgAU2vMRZZTNFPqUV");
+        Address toAddr = Address.fromString(networkParams, "QeyxkrKbgKvxbBY1HLiBYjMnZx1HDRMYmd");
 
         Script redeemScript = ScriptBuilder.createMultiSigOutputScript(2, ImmutableList.of(privKey1, privKey2));
         Transaction newTx = new Transaction(networkParams);
@@ -125,7 +125,7 @@ public class TransactionTest {
 
     @Test
     public void TestTransactionWitnessV0ToP2WPKHOverP2SH() {
-        Address toAddr = Address.fromString(networkParams, "2NDRPoDWiwgK7Fj25aG4JLJwx2j4NucGHaz");
+        Address toAddr = Address.fromString(networkParams, "Qgn9vENxxnNCPun8CN6KR1PPB7WCo9oxqc");
         String prevTxId = "d14891128bc4c72dfa45269f302edf690289214874c5ee40b118c1d5465319e6";
 
         Script redeemScript = ScriptBuilder.createMultiSigOutputScript(2, ImmutableList.of(privKey1, privKey2));
@@ -193,7 +193,7 @@ public class TransactionTest {
 
         Script redeemScript = ScriptBuilder.createP2PKHOutputScript(privKey1);
 
-        Address toAddr = Address.fromString(networkParams, "2MvCbr6rgoSafAEafGMv6p2dpRgByXHWNgw");
+        Address toAddr = Address.fromString(networkParams, "QPZMy7ivpYdkJRLhtTx7tj5Fa4doQ2auWk");
 
         Transaction newTx = new Transaction(networkParams);
         newTx.addInput(Sha256Hash.wrap(prevTxId), 0, redeemScript).clearScriptBytes();

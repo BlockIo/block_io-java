@@ -1,11 +1,16 @@
 package lib;
 
+import com.google.common.collect.ImmutableList;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import okhttp3.*;
-import org.bitcoinj.core.ECKey;
-import org.bitcoinj.core.NetworkParameters;
+import org.bitcoinj.core.*;
+import org.bitcoinj.core.Address;
+import org.bitcoinj.crypto.TransactionSignature;
+import org.bitcoinj.script.Script;
+import org.bitcoinj.script.ScriptBuilder;
+import org.bouncycastle.util.encoders.Hex;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.libdohj.params.DogecoinMainNetParams;
@@ -15,9 +20,9 @@ import org.libdohj.params.LitecoinTestNet3Params;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.nio.charset.StandardCharsets;
+import java.security.NoSuchAlgorithmException;
+import java.util.*;
 
 public class BlockIo {
     private OkHttpClient RestClient;
@@ -83,11 +88,11 @@ public class BlockIo {
                 .build();
     }
 
-    public JSONObject createAndSignTransaction(JSONObject data) {
+    public JSONObject createAndSignTransaction(JSONObject data) throws Exception {
         return createAndSignTransaction(data, new String[]{});
     }
 
-    public JSONObject createAndSignTransaction(JSONObject data, String [] keys) {
+    public JSONObject createAndSignTransaction(JSONObject data, String [] keys) throws Exception {
         String status = data.containsKey("status") ? data.get("status").toString() : "";
         JSONObject dataObj = (JSONObject) data.get("data");
         String networkString = dataObj.containsKey("network") ? dataObj.get("network").toString() : "";
@@ -102,20 +107,136 @@ public class BlockIo {
         JSONArray outputs = (JSONArray) dataObj.get("outputs");
         JSONArray inputAddressData = (JSONArray) dataObj.get("input_address_data");
 
+        Transaction tx = new Transaction(networkParams);
+
+        for(Object input : inputs) {
+            JSONObject curInput = (JSONObject) input;
+            Sha256Hash preTxId = Sha256Hash.wrap(curInput.get("previous_txid").toString());
+            int outputIndex = Integer.parseInt(curInput.get("previous_output_index").toString());
+            tx.addInput(preTxId, outputIndex, new ScriptBuilder().data(new byte[0]).build()).clearScriptBytes();
+        }
+
+        for(Object output : outputs) {
+            JSONObject curOutput = (JSONObject) output;
+            Address receivingAddr = Address.fromString(networkParams, curOutput.get("receiving_address").toString());
+            Coin outputValue = Coin.parseCoin(curOutput.get("output_value").toString());
+            tx.addOutput(outputValue, receivingAddr);
+        }
+
+        String txHex = Helper.txToHexString(tx);
+
         HashMap<String, JSONObject> addressDataMap = new HashMap<>();
+        HashMap<String, Script> addressScriptMap = new HashMap<>();
+
         for (Object inputAddressDatum : inputAddressData) {
             JSONObject curInputAddrData = (JSONObject) inputAddressDatum;
 
             JSONObject curAddrData = new JSONObject();
+            String curAddrType = curInputAddrData.get("address_type").toString();
+            JSONArray pubkeys = (JSONArray) curInputAddrData.get("public_keys");
+
             curAddrData.put("required_signatures", curInputAddrData.get("required_signatures"));
-            curAddrData.put("public_keys", curInputAddrData.get("public_keys"));
-            curAddrData.put("address_type", curInputAddrData.get("address_type"));
+            curAddrData.put("public_keys", pubkeys);
+            curAddrData.put("address_type", curAddrType);
 
             addressDataMap.put(curInputAddrData.get("address").toString(), curAddrData);
+
+            ArrayList<ECKey> pubkeyList = new ArrayList<>();
+            for(Object pubkey : pubkeys) {
+                ECKey curPubKey = ECKey.fromPublicOnly(Hex.decode(pubkey.toString()));
+                pubkeyList.add(curPubKey);
+            }
+
+            Script redeem;
+
+            if(curAddrType.equals("P2WSH-over-P2SH") || curAddrType.equals("WITNESS_V0") || curAddrType.equals("P2SH")) {
+                redeem = ScriptBuilder.createMultiSigOutputScript(2, pubkeyList);
+            } else if(curAddrType.equals("P2PKH") || curAddrType.equals("P2WPKH") || curAddrType.equals("P2WPKH-over-P2SH")) {
+                redeem = ScriptBuilder.createP2PKHOutputScript(pubkeyList.get(0));
+            } else{
+                throw new Exception("Unrecognized address type: " + curAddrType);
+            }
+            addressScriptMap.put(curInputAddrData.get("address").toString(), redeem);
         }
 
-        System.out.println(addressDataMap.get("QcnYiN3t3foHxHv7CnqXrmRoiMkADhapZw").get("address_type"));
-        return new JSONObject();
+        if(keys.length > 0) {
+            for(String key : keys) {
+                ECKey userKey = Key.fromHex(key);
+                userKeys.put(userKey.getPublicKeyAsHex(), userKey);
+            }
+        }
+
+        if(dataObj.containsKey("user_key") && !userKeys.containsKey(((JSONObject)dataObj.get("user_key")).get("public_key").toString())){
+            if(Pin != null) {
+                String encryptionKey = Helper.pinToAesKey(Pin);
+                String pubkeyStr = ((JSONObject)dataObj.get("user_key")).get("public_key").toString();
+                ECKey key = Key.extractKeyFromEncryptedPassphrase(((JSONObject)dataObj.get("user_key")).get("encrypted_passphrase").toString(), encryptionKey);
+
+                if(!key.getPublicKeyAsHex().equals(pubkeyStr)) {
+                    throw new Exception("Fail: Invalid Secret PIN provided.");
+                }
+                userKeys.put(pubkeyStr, key);
+            } else {
+                throw new Exception("Fail: No PIN provided to decrypt private key.");
+            }
+        }
+
+        if(dataObj.containsKey("expected_unsigned_txid") && !dataObj.get("expected_unsigned_txid").toString().equals(tx.getTxId().toString())) {
+            throw new Exception("Expected unsigned transaction ID mismatch. Please report this error to support@block.io.");
+        }
+
+        boolean isTxFullySigned = true;
+        JSONArray signatures = new JSONArray();
+
+        for(Object input: inputs) {
+            JSONObject curInput = (JSONObject) input;
+            String curAddr = curInput.get("spending_address").toString();
+            Script curAddrScript = addressScriptMap.get(curAddr);
+            String curAddrType = addressDataMap.get(curAddr).get("address_type").toString();
+            int addrRequiredSigs = Integer.parseInt(addressDataMap.get(curAddr).get("required_signatures").toString());
+            JSONArray curPubKeys = (JSONArray) addressDataMap.get(curAddr).get("public_keys");
+            int curSigCount = 0;
+            int inputIte = Integer.parseInt(curInput.get("input_index").toString());
+            Coin inputValue = Coin.parseCoin(curInput.get("input_value").toString());
+
+            for(Object pubkey: curPubKeys) {
+                String pubkeyStr = pubkey.toString();
+                if(userKeys.containsKey(pubkeyStr)) {
+                    ECKey key = userKeys.get(pubkeyStr);
+                    Sha256Hash sigHash;
+                    if(curAddrType.equals("P2WSH-over-P2SH") || curAddrType.equals("WITNESS_V0") || curAddrType.equals("P2WPKH")
+                            || curAddrType.equals("P2WPKH-over-P2SH")) {
+                        sigHash = tx.hashForWitnessSignature(inputIte, curAddrScript, inputValue, Transaction.SigHash.ALL, false);
+                    } else{
+                        sigHash = tx.hashForSignature(inputIte, curAddrScript, Transaction.SigHash.ALL, false);
+                    }
+                    ECKey.ECDSASignature sig = key.sign(sigHash);
+                    TransactionSignature txSig = new TransactionSignature(sig, Transaction.SigHash.ALL, false);
+                    JSONObject sigObj = new JSONObject();
+                    sigObj.put("input_index", inputIte);
+                    sigObj.put("public_key", pubkeyStr);
+                    sigObj.put("signature", Utils.HEX.encode(txSig.encodeToDER()));
+                    signatures.add(sigObj);
+                    curSigCount++;
+                }
+            }
+            if(curSigCount < addrRequiredSigs) {
+                isTxFullySigned = false;
+            }
+        }
+
+        JSONObject createAndSignResponse = new JSONObject();
+
+        if(isTxFullySigned) {
+            signatures = null;
+        }
+        createAndSignResponse.put("tx_type", dataObj.get("tx_type").toString());
+        createAndSignResponse.put("tx_hex", txHex);
+        createAndSignResponse.put("signatures", signatures);
+
+        userKeys.clear();
+        System.out.println(createAndSignResponse);
+        return createAndSignResponse;
     }
 
     private NetworkParameters getNetwork(String networkString)

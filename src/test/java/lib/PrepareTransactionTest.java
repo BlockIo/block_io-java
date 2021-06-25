@@ -33,7 +33,7 @@ public class PrepareTransactionTest {
     }
 
     @Test
-    void testCreateAndSignTransaction() throws IOException, ParseException {
+    void testCreateAndSignTransaction() throws Exception {
         JSONParser parser = new JSONParser();
         JSONObject prepareTransactionResponse = (JSONObject) parser.parse(
                 new FileReader("src/test/resources/__files/json/prepare_transaction_response.json")
