@@ -1,9 +1,7 @@
 package lib;
 
-import org.bitcoinj.core.ECKey;
-import org.bitcoinj.core.Sha256Hash;
-import org.bitcoinj.core.Transaction;
-import org.bitcoinj.core.Utils;
+import org.bitcoinj.core.*;
+import org.bitcoinj.crypto.TransactionSignature;
 import org.bitcoinj.script.Script;
 import org.bitcoinj.script.ScriptBuilder;
 import org.bouncycastle.crypto.digests.SHA256Digest;
@@ -110,5 +108,15 @@ public class Helper {
         output.write(redeem.getPubKeyHash());
         byte[] out = output.toByteArray();
         return new ScriptBuilder().data(out).build();
+    }
+
+    public static TransactionWitness redeemP2WSH(TransactionSignature txSig1, TransactionSignature txSig2, Script redeem) {
+        TransactionWitness wit = new TransactionWitness(4);
+        wit.setPush(0, new byte[0]);
+        wit.setPush(1, txSig1.encodeToBitcoin());
+        wit.setPush(2, txSig2.encodeToBitcoin());
+        wit.setPush(3, redeem.getProgram());
+
+        return wit;
     }
 }

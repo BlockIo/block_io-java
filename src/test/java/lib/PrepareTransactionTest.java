@@ -36,12 +36,12 @@ public class PrepareTransactionTest {
     void testCreateAndSignTransaction() throws IOException, ParseException {
         JSONParser parser = new JSONParser();
         JSONObject prepareTransactionResponse = (JSONObject) parser.parse(
-                new FileReader("src/test/resources/__files/json/prepare_sweep_transaction_response_p2wpkh.json")
+                new FileReader("src/test/resources/__files/json/prepare_transaction_response.json")
         );;
         JSONObject createAndSignTransactionResponse = (JSONObject) parser.parse(
-                new FileReader("src/test/resources/__files/json/create_and_sign_transaction_response_sweep_p2wpkh.json")
-        );;
-        System.out.println(prepareTransactionResponse.get("status"));
-        assertEquals(true, true);
+                new FileReader("src/test/resources/__files/json/create_and_sign_transaction_response.json")
+        );
+        JSONObject response = blockIo.createAndSignTransaction(prepareTransactionResponse);
+        assertEquals(response, createAndSignTransactionResponse);
     }
 }

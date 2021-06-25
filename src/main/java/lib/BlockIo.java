@@ -5,6 +5,13 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import okhttp3.*;
 import org.bitcoinj.core.ECKey;
+import org.bitcoinj.core.NetworkParameters;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.libdohj.params.DogecoinMainNetParams;
+import org.libdohj.params.DogecoinTestNet3Params;
+import org.libdohj.params.LitecoinMainNetParams;
+import org.libdohj.params.LitecoinTestNet3Params;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -28,6 +35,8 @@ public class BlockIo {
     private String DefaultServer = "" ;
     private String DefaultPort = "";
     private String Host = "block.io";
+    private NetworkParameters networkParams;
+    HashMap<String, ECKey> userKeys;
 
     public BlockIo(String apiKey) throws UnsupportedEncodingException {
         this(apiKey, null, 2, new Options());
@@ -42,6 +51,9 @@ public class BlockIo {
     }
 
     public BlockIo(String apiKey, String pin, int version, Options opts ) throws UnsupportedEncodingException {
+        networkParams = null;
+        userKeys = new HashMap<>();
+
         Opts = opts;
         Pin = pin == null || pin.equals("") ? null : pin;
         AesKey = null;
@@ -69,6 +81,60 @@ public class BlockIo {
         RestClient = new OkHttpClient.Builder()
                 .connectionSpecs(Arrays.asList(requireTls12, ConnectionSpec.CLEARTEXT))
                 .build();
+    }
+
+    public JSONObject createAndSignTransaction(JSONObject data) {
+        return createAndSignTransaction(data, new String[]{});
+    }
+
+    public JSONObject createAndSignTransaction(JSONObject data, String [] keys) {
+        String status = data.containsKey("status") ? data.get("status").toString() : "";
+        JSONObject dataObj = (JSONObject) data.get("data");
+        String networkString = dataObj.containsKey("network") ? dataObj.get("network").toString() : "";
+
+        if(networkParams == null && !status.equals("")
+            && status.equals("success") && !dataObj.isEmpty()
+            && !networkString.equals("")) {
+            networkParams = getNetwork(networkString);
+        }
+
+        JSONArray inputs = (JSONArray) dataObj.get("inputs");
+        JSONArray outputs = (JSONArray) dataObj.get("outputs");
+        JSONArray inputAddressData = (JSONArray) dataObj.get("input_address_data");
+
+        HashMap<String, JSONObject> addressDataMap = new HashMap<>();
+        for (Object inputAddressDatum : inputAddressData) {
+            JSONObject curInputAddrData = (JSONObject) inputAddressDatum;
+
+            JSONObject curAddrData = new JSONObject();
+            curAddrData.put("required_signatures", curInputAddrData.get("required_signatures"));
+            curAddrData.put("public_keys", curInputAddrData.get("public_keys"));
+            curAddrData.put("address_type", curInputAddrData.get("address_type"));
+
+            addressDataMap.put(curInputAddrData.get("address").toString(), curAddrData);
+        }
+
+        System.out.println(addressDataMap.get("QcnYiN3t3foHxHv7CnqXrmRoiMkADhapZw").get("address_type"));
+        return new JSONObject();
+    }
+
+    private NetworkParameters getNetwork(String networkString)
+    {
+        switch (networkString)
+        {
+            case "LTC":
+                return LitecoinMainNetParams.get();
+            case "DOGE":
+                return DogecoinMainNetParams.get();
+            case "BTCTEST":
+                return NetworkParameters.fromID(NetworkParameters.ID_TESTNET);
+            case "LTCTEST":
+                return LitecoinTestNet3Params.get();
+            case "DOGETEST":
+                return DogecoinTestNet3Params.get();
+            default:
+                return NetworkParameters.fromID(NetworkParameters.ID_MAINNET);
+        }
     }
 
     private Map<String, Object> _withdraw(String method, String path, Map<String, Object> args) throws Exception {
