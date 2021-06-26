@@ -57,4 +57,43 @@ public class PrepareTransactionTest {
         JSONObject response = blockIo.createAndSignTransaction(prepareTransactionResponse, sweepKeys);
         assertEquals(response.toJSONString(), createAndSignTransactionResponse.toJSONString());
     }
+
+    @Test
+    void testSweepP2WPKHOverP2SH() throws Exception {
+        JSONParser parser = new JSONParser();
+        JSONObject prepareTransactionResponse = (JSONObject) parser.parse(
+                new FileReader("src/test/resources/__files/json/prepare_sweep_transaction_response_p2wpkh_over_p2sh.json")
+        );;
+        JSONObject createAndSignTransactionResponse = (JSONObject) parser.parse(
+                new FileReader("src/test/resources/__files/json/create_and_sign_transaction_response_sweep_p2wpkh_over_p2sh_non_lowR.json")
+        );
+        JSONObject response = blockIo.createAndSignTransaction(prepareTransactionResponse, sweepKeys);
+        assertEquals(response.toJSONString(), createAndSignTransactionResponse.toJSONString());
+    }
+
+    @Test
+    void testSweepP2PKH() throws Exception {
+        JSONParser parser = new JSONParser();
+        JSONObject prepareTransactionResponse = (JSONObject) parser.parse(
+                new FileReader("src/test/resources/__files/json/prepare_sweep_transaction_response_p2pkh.json")
+        );;
+        JSONObject createAndSignTransactionResponse = (JSONObject) parser.parse(
+                new FileReader("src/test/resources/__files/json/create_and_sign_transaction_response_sweep_p2pkh_non_lowR.json")
+        );
+        JSONObject response = blockIo.createAndSignTransaction(prepareTransactionResponse, sweepKeys);
+        assertEquals(response.toJSONString(), createAndSignTransactionResponse.toJSONString());
+    }
+
+    @Test
+    void testDTrustWitnessV04of5Keys() throws Exception {
+        JSONParser parser = new JSONParser();
+        JSONObject prepareTransactionResponse = (JSONObject) parser.parse(
+                new FileReader("src/test/resources/__files/json/prepare_dtrust_transaction_response_witness_v0.json")
+        );;
+        JSONObject createAndSignTransactionResponse = (JSONObject) parser.parse(
+                new FileReader("src/test/resources/__files/json/create_and_sign_transaction_response_dtrust_witness_v0_4_of_5_keys.json")
+        );
+        JSONObject response = blockIo.createAndSignTransaction(prepareTransactionResponse, dtrustKeys);
+        assertEquals(response.toJSONString(), createAndSignTransactionResponse.toJSONString());
+    }
 }
