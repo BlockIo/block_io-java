@@ -18,6 +18,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.Base64;
+import java.util.List;
 
 public class Helper {
 
@@ -110,13 +111,16 @@ public class Helper {
         return new ScriptBuilder().data(out).build();
     }
 
-    public static TransactionWitness redeemP2WSH(TransactionSignature txSig1, TransactionSignature txSig2, Script redeem) {
-        TransactionWitness wit = new TransactionWitness(4);
+    public static TransactionWitness redeemP2WSH(List<TransactionSignature> signatures, Script redeem) {
+        int witnesses = signatures.size() + 2;
+        TransactionWitness wit = new TransactionWitness(witnesses);
         wit.setPush(0, new byte[0]);
-        wit.setPush(1, txSig1.encodeToBitcoin());
-        wit.setPush(2, txSig2.encodeToBitcoin());
-        wit.setPush(3, redeem.getProgram());
-
+        int witnessIte = 1;
+        for (TransactionSignature signature : signatures) {
+            wit.setPush(witnessIte, signature.encodeToBitcoin());
+            witnessIte++;
+        }
+        wit.setPush(witnessIte, redeem.getProgram());
         return wit;
     }
 }

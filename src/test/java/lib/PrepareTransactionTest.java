@@ -44,4 +44,17 @@ public class PrepareTransactionTest {
         JSONObject response = blockIo.createAndSignTransaction(prepareTransactionResponse);
         assertEquals(response.toJSONString(), createAndSignTransactionResponse.toJSONString());
     }
+
+    @Test
+    void testSweepP2WPKH() throws Exception {
+        JSONParser parser = new JSONParser();
+        JSONObject prepareTransactionResponse = (JSONObject) parser.parse(
+                new FileReader("src/test/resources/__files/json/prepare_sweep_transaction_response_p2wpkh.json")
+        );;
+        JSONObject createAndSignTransactionResponse = (JSONObject) parser.parse(
+                new FileReader("src/test/resources/__files/json/create_and_sign_transaction_response_sweep_p2wpkh_non_lowR.json")
+        );
+        JSONObject response = blockIo.createAndSignTransaction(prepareTransactionResponse, sweepKeys);
+        assertEquals(response.toJSONString(), createAndSignTransactionResponse.toJSONString());
+    }
 }

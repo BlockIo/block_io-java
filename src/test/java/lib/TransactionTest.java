@@ -84,7 +84,6 @@ public class TransactionTest {
         ECKey.ECDSASignature sig1 = privKey1.sign(sigHash);
         TransactionSignature txSig = new TransactionSignature(sig1, Transaction.SigHash.ALL, false);
 
-        newTx.getInput(0).setScriptSig(ScriptBuilder.createEmpty());
         newTx.getInput(0).setWitness(TransactionWitness.redeemP2WPKH(txSig, privKey1));
 
         assertEquals(Helper.txToHexString(newTx), "01000000000101012ca4024859020c1119328cc070fae002bde52a191b61904c8e98da3c8da7660000000000ffffffff01d0549a3b00000000220020d42b8341140559b7da105e8669e8f7d5a03773642ad82403ba91b80ffcc415de02483045022100c5db5e86122fd9609dda1f17a6dd3527074ef9b301fd23273b3940bfd8225e4e0220089b268c45437f5ac692be0d546971e84e7dc59c6ce309f5a10dd7cdcc4bb683012103820317ad251bca573c8fda2b8f26ffc9aae9d5ecb15b50ee08d8f9e009def38e00000000");
@@ -117,7 +116,7 @@ public class TransactionTest {
         TransactionSignature txSig2 = new TransactionSignature(sig2, Transaction.SigHash.ALL, false);
 
         newTx.getInput(0).setScriptSig(p2wshScript);
-        newTx.getInput(0).setWitness(Helper.redeemP2WSH(txSig1, txSig2, redeemScript));
+        newTx.getInput(0).setWitness(Helper.redeemP2WSH(ImmutableList.of(txSig1, txSig2), redeemScript));
 
         assertEquals(Helper.txToHexString(newTx), "01000000000101c7180103b2b74e25585bd1054d9207b11357e192512da4d95eee782312c664240000000023220020d42b8341140559b7da105e8669e8f7d5a03773642ad82403ba91b80ffcc415deffffffff01e07b9a3b00000000160014b2b2380a1e486aff5ae5ae74c892e902a72c0a4c0400473044022067c9f8ed5c8f0770be1b7d44ade72c4d976a2b0e6c4df39ea70923daff26ea5e02205894350de5304d446343fbf95245cd656876a11c94025554bf878b3ecf90db720147304402204ee76a1814b3eb289e492409bd29ebb77088c9c20645c8a63c75bfe44eac41f70220232bcd35a0cc78e88dfa59dc15331023c3d3bb3a8b63e6b753c8ab4599b7bd290147522103820317ad251bca573c8fda2b8f26ffc9aae9d5ecb15b50ee08d8f9e009def38e210238de8c9eb2842ecaf0cc61ee6ba23fe4e46f1cfd82eac0910e1d8e865bd76df952ae00000000");
         assertEquals(newTx.getTxId().toString(), "66a78d3cda988e4c90611b192ae5bd02e0fa70c08c3219110c02594802a42c01");
@@ -148,7 +147,7 @@ public class TransactionTest {
         TransactionSignature txSig1 = new TransactionSignature(sig1, Transaction.SigHash.ALL, false);
         TransactionSignature txSig2 = new TransactionSignature(sig2, Transaction.SigHash.ALL, false);
 
-        newTx.getInput(0).setWitness(Helper.redeemP2WSH(txSig1, txSig2, redeemScript));
+        newTx.getInput(0).setWitness(Helper.redeemP2WSH(ImmutableList.of(txSig1, txSig2), redeemScript));
 
         assertEquals(Helper.txToHexString(newTx), "01000000000101e6195346d5c118b140eec5744821890269df2e309f2645fa2dc7c48b129148d10000000000ffffffff01c02d9a3b0000000017a914dd4edd1406541e476450fda7924720fe19f337b9870400483045022100b6b658f7d3d592645cdc7ca21d45504ffde7d9b2ef22e97b7b57c507e952b006022059631267d3fcdfb06a4efdf940dabaf022e051bda9d93de2ef400e94ea2b39be01473044022033d8136791bc5658700b385ca5728b9e188a3ba1aa3bc691d6adfd1b8431cee6022073d565e5d1e96c0257f7cefdab946e48fb3857248f49048e00f6b701e97457c30147522103820317ad251bca573c8fda2b8f26ffc9aae9d5ecb15b50ee08d8f9e009def38e210238de8c9eb2842ecaf0cc61ee6ba23fe4e46f1cfd82eac0910e1d8e865bd76df952ae00000000");
         assertEquals(newTx.getTxId().toString(), "d76dd93d5afbc8cb3bfd487445fac9f81d7ae409723990f7744f398feae9c0e4");

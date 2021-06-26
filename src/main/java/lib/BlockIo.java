@@ -113,7 +113,7 @@ public class BlockIo {
             JSONObject curInput = (JSONObject) input;
             Sha256Hash preTxId = Sha256Hash.wrap(curInput.get("previous_txid").toString());
             int outputIndex = Integer.parseInt(curInput.get("previous_output_index").toString());
-            tx.addInput(preTxId, outputIndex, new ScriptBuilder().data(new byte[0]).build()).clearScriptBytes();
+            tx.addInput(preTxId, outputIndex, ScriptBuilder.createEmpty()).clearScriptBytes();
         }
 
         for(Object output : outputs) {
@@ -150,7 +150,7 @@ public class BlockIo {
             Script redeem;
 
             if(curAddrType.equals("P2WSH-over-P2SH") || curAddrType.equals("WITNESS_V0") || curAddrType.equals("P2SH")) {
-                redeem = ScriptBuilder.createMultiSigOutputScript(2, pubkeyList);
+                redeem = ScriptBuilder.createMultiSigOutputScript(pubkeyList.size(), pubkeyList);
             } else if(curAddrType.equals("P2PKH") || curAddrType.equals("P2WPKH") || curAddrType.equals("P2WPKH-over-P2SH")) {
                 redeem = ScriptBuilder.createP2PKHOutputScript(pubkeyList.get(0));
             } else{
@@ -198,20 +198,24 @@ public class BlockIo {
             int curSigCount = 0;
             int inputIte = Integer.parseInt(curInput.get("input_index").toString());
             Coin inputValue = Coin.parseCoin(curInput.get("input_value").toString());
+            Sha256Hash sigHash;
+            if(curAddrType.equals("P2WSH-over-P2SH") || curAddrType.equals("WITNESS_V0") || curAddrType.equals("P2WPKH")
+                    || curAddrType.equals("P2WPKH-over-P2SH")) {
+                sigHash = tx.hashForWitnessSignature(inputIte, curAddrScript, inputValue, Transaction.SigHash.ALL, false);
+            } else{
+                sigHash = tx.hashForSignature(inputIte, curAddrScript, Transaction.SigHash.ALL, false);
+            }
 
+            ArrayList<TransactionSignature> txSigList = new ArrayList<>();
+            ArrayList<ECKey> curKeys = new ArrayList<>();
             for(Object pubkey: curPubKeys) {
                 String pubkeyStr = pubkey.toString();
                 if(userKeys.containsKey(pubkeyStr)) {
                     ECKey key = userKeys.get(pubkeyStr);
-                    Sha256Hash sigHash;
-                    if(curAddrType.equals("P2WSH-over-P2SH") || curAddrType.equals("WITNESS_V0") || curAddrType.equals("P2WPKH")
-                            || curAddrType.equals("P2WPKH-over-P2SH")) {
-                        sigHash = tx.hashForWitnessSignature(inputIte, curAddrScript, inputValue, Transaction.SigHash.ALL, false);
-                    } else{
-                        sigHash = tx.hashForSignature(inputIte, curAddrScript, Transaction.SigHash.ALL, false);
-                    }
                     ECKey.ECDSASignature sig = key.sign(sigHash);
                     TransactionSignature txSig = new TransactionSignature(sig, Transaction.SigHash.ALL, false);
+                    txSigList.add(txSig);
+                    curKeys.add(key);
                     JSONObject sigObj = new JSONObject();
                     sigObj.put("input_index", inputIte);
                     sigObj.put("public_key", pubkeyStr);
@@ -220,6 +224,27 @@ public class BlockIo {
                     curSigCount++;
                 }
             }
+
+            if(curAddrType.equals("P2WSH-over-P2SH")) {
+                tx.getInput(inputIte).setScriptSig(Helper.createBlockIoP2WSHScript(curAddrScript));
+                tx.getInput(inputIte).setWitness(Helper.redeemP2WSH(txSigList, curAddrScript));
+            } else if(curAddrType.equals("WITNESS_V0")) {
+                tx.getInput(inputIte).setWitness(Helper.redeemP2WSH(txSigList, curAddrScript));
+            } else if(curAddrType.equals("P2WPKH")) {
+                tx.getInput(inputIte).setWitness(TransactionWitness.redeemP2WPKH(txSigList.get(0), curKeys.get(0)));
+            } else if(curAddrType.equals("P2WPKH-over-P2SH")) {
+                Script redeem = ScriptBuilder.createP2WPKHOutputScript(curKeys.get(0));
+                tx.getInput(inputIte).setScriptSig(Helper.createBlockIoP2WPKHScript(redeem));
+                tx.getInput(inputIte).setWitness(TransactionWitness.redeemP2WPKH(txSigList.get(0), curKeys.get(0)));
+            } else if(curAddrType.equals("P2SH")){
+                Script inputScript = ScriptBuilder.createP2SHMultiSigInputScript(txSigList, curAddrScript);
+                tx.getInput(inputIte).setScriptSig(inputScript);
+            } else {
+                // P2PKH
+                Script inputScript = ScriptBuilder.createInputScript(txSigList.get(0), curKeys.get(0));
+                tx.getInput(inputIte).setScriptSig(inputScript);
+            }
+
             if(curSigCount < addrRequiredSigs) {
                 isTxFullySigned = false;
             }
@@ -228,6 +253,7 @@ public class BlockIo {
         JSONObject createAndSignResponse = new JSONObject();
 
         if(isTxFullySigned) {
+            txHex = Helper.txToHexString(tx);
             signatures = null;
         }
         createAndSignResponse.put("tx_type", dataObj.get("tx_type").toString());
