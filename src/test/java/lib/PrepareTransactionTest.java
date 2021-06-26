@@ -39,9 +39,9 @@ public class PrepareTransactionTest {
                 new FileReader("src/test/resources/__files/json/prepare_transaction_response.json")
         );;
         JSONObject createAndSignTransactionResponse = (JSONObject) parser.parse(
-                new FileReader("src/test/resources/__files/json/create_and_sign_transaction_response.json")
+                new FileReader("src/test/resources/__files/json/create_and_sign_transaction_response_non_lowR.json")
         );
         JSONObject response = blockIo.createAndSignTransaction(prepareTransactionResponse);
-        assertEquals(response, createAndSignTransactionResponse);
+        assertEquals(response.toJSONString(), createAndSignTransactionResponse.toJSONString());
     }
 }

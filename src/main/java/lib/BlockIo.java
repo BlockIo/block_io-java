@@ -235,7 +235,6 @@ public class BlockIo {
         createAndSignResponse.put("signatures", signatures);
 
         userKeys.clear();
-        System.out.println(createAndSignResponse);
         return createAndSignResponse;
     }
 
