@@ -11,7 +11,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.Arrays;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class PrepareTransactionTest {
     private String pin;
@@ -174,5 +174,29 @@ public class PrepareTransactionTest {
         );
         JSONObject response = blockIo.createAndSignTransaction(prepareTransactionResponse, new String[] {dtrustKeys[1], dtrustKeys[2], dtrustKeys[0]});
         assertEquals(response.toJSONString(), createAndSignTransactionResponse.toJSONString());
+    }
+
+    @Test
+    void testUseOfExpectedUnsignedTxid() throws Exception {
+        JSONParser parser = new JSONParser();
+        JSONObject prepareTransactionResponse = (JSONObject) parser.parse(
+                new FileReader("src/test/resources/__files/json/prepare_transaction_response_with_blockio_fee_and_expected_unsigned_txid.json")
+        );;
+        JSONObject createAndSignTransactionResponse = (JSONObject) parser.parse(
+                new FileReader("src/test/resources/__files/json/create_and_sign_transaction_response_with_blockio_fee_and_expected_unsigned_txid_non_lowR.json")
+        );
+        JSONObject response = blockIo.createAndSignTransaction(prepareTransactionResponse);
+        assertEquals(response.toJSONString(), createAndSignTransactionResponse.toJSONString());
+
+        JSONObject dataObj = (JSONObject) prepareTransactionResponse.get("data");
+        dataObj.put("expected_unsigned_txid", "");
+        prepareTransactionResponse.put("data", dataObj);
+
+        try{
+            blockIo.createAndSignTransaction(prepareTransactionResponse);
+            fail();
+        } catch(Exception ex) {
+            assertTrue(true);
+        }
     }
 }
