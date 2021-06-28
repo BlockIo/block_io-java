@@ -110,4 +110,69 @@ public class PrepareTransactionTest {
         JSONObject response = blockIo.createAndSignTransaction(prepareTransactionResponse, Arrays.copyOfRange(dtrustKeys, 0, 3));
         assertEquals(response.toJSONString(), createAndSignTransactionResponse.toJSONString());
     }
+
+    @Test
+    void testDTrustP2WSHOverP2SH4of5Keys() throws Exception {
+        JSONParser parser = new JSONParser();
+        JSONObject prepareTransactionResponse = (JSONObject) parser.parse(
+                new FileReader("src/test/resources/__files/json/prepare_dtrust_transaction_response_p2wsh_over_p2sh.json")
+        );;
+        JSONObject createAndSignTransactionResponse = (JSONObject) parser.parse(
+                new FileReader("src/test/resources/__files/json/create_and_sign_transaction_response_dtrust_p2wsh_over_p2sh_4_of_5_keys_non_lowR.json")
+        );
+        JSONObject response = blockIo.createAndSignTransaction(prepareTransactionResponse, dtrustKeys);
+        assertEquals(response.toJSONString(), createAndSignTransactionResponse.toJSONString());
+    }
+
+    @Test
+    void testDTrustP2WSHOverP2SH3of5Keys() throws Exception {
+        JSONParser parser = new JSONParser();
+        JSONObject prepareTransactionResponse = (JSONObject) parser.parse(
+                new FileReader("src/test/resources/__files/json/prepare_dtrust_transaction_response_p2wsh_over_p2sh.json")
+        );;
+        JSONObject createAndSignTransactionResponse = (JSONObject) parser.parse(
+                new FileReader("src/test/resources/__files/json/create_and_sign_transaction_response_dtrust_p2wsh_over_p2sh_3_of_5_keys_non_lowR.json")
+        );
+        JSONObject response = blockIo.createAndSignTransaction(prepareTransactionResponse, Arrays.copyOfRange(dtrustKeys, 0, 3));
+        assertEquals(response.toJSONString(), createAndSignTransactionResponse.toJSONString());
+    }
+
+    @Test
+    void testDTrustP2SH4of5Keys() throws Exception {
+        JSONParser parser = new JSONParser();
+        JSONObject prepareTransactionResponse = (JSONObject) parser.parse(
+                new FileReader("src/test/resources/__files/json/prepare_dtrust_transaction_response_p2sh.json")
+        );;
+        JSONObject createAndSignTransactionResponse = (JSONObject) parser.parse(
+                new FileReader("src/test/resources/__files/json/create_and_sign_transaction_response_dtrust_p2sh_4_of_5_keys_non_lowR.json")
+        );
+        JSONObject response = blockIo.createAndSignTransaction(prepareTransactionResponse, dtrustKeys);
+        assertEquals(response.toJSONString(), createAndSignTransactionResponse.toJSONString());
+    }
+
+    @Test
+    void testDTrustP2SH3of5Keys() throws Exception {
+        JSONParser parser = new JSONParser();
+        JSONObject prepareTransactionResponse = (JSONObject) parser.parse(
+                new FileReader("src/test/resources/__files/json/prepare_dtrust_transaction_response_p2sh.json")
+        );;
+        JSONObject createAndSignTransactionResponse = (JSONObject) parser.parse(
+                new FileReader("src/test/resources/__files/json/create_and_sign_transaction_response_dtrust_p2sh_3_of_5_keys_non_lowR.json")
+        );
+        JSONObject response = blockIo.createAndSignTransaction(prepareTransactionResponse, Arrays.copyOfRange(dtrustKeys, 0, 3));
+        assertEquals(response.toJSONString(), createAndSignTransactionResponse.toJSONString());
+    }
+
+    @Test
+    void testDTrustP2SH3of5UnorderedKeys() throws Exception {
+        JSONParser parser = new JSONParser();
+        JSONObject prepareTransactionResponse = (JSONObject) parser.parse(
+                new FileReader("src/test/resources/__files/json/prepare_dtrust_transaction_response_p2sh.json")
+        );;
+        JSONObject createAndSignTransactionResponse = (JSONObject) parser.parse(
+                new FileReader("src/test/resources/__files/json/create_and_sign_transaction_response_dtrust_p2sh_3_of_5_keys_non_lowR.json")
+        );
+        JSONObject response = blockIo.createAndSignTransaction(prepareTransactionResponse, new String[] {dtrustKeys[1], dtrustKeys[2], dtrustKeys[0]});
+        assertEquals(response.toJSONString(), createAndSignTransactionResponse.toJSONString());
+    }
 }
