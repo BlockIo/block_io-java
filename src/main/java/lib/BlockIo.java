@@ -1,6 +1,5 @@
 package lib;
 
-import com.google.common.collect.ImmutableList;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -20,8 +19,8 @@ import org.libdohj.params.LitecoinTestNet3Params;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.nio.charset.StandardCharsets;
-import java.security.NoSuchAlgorithmException;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.*;
 
 public class BlockIo {
@@ -263,6 +262,48 @@ public class BlockIo {
 
         userKeys.clear();
         return createAndSignResponse;
+    }
+
+    public JSONObject summarizePreparedTransaction(JSONObject data) {
+
+        data = (JSONObject) data.get("data");
+        JSONArray inputs = (JSONArray) data.get("inputs");
+        JSONArray outputs = (JSONArray) data.get("outputs");
+
+        double inputSum = 0;
+        double blockIoFee = 0;
+        double changeAmount = 0;
+        double outputSum = 0;
+
+        for(Object input : inputs) {
+            String inputValue = ((JSONObject) input).get("input_value").toString();
+            inputSum += Double.parseDouble(inputValue);
+        }
+
+        for(Object output: outputs) {
+            String outputCategory = ((JSONObject) output).get("output_category").toString();
+            String value = ((JSONObject) output).get("output_value").toString();
+            if(outputCategory.equals("blockio-fee")) {
+                blockIoFee += Double.parseDouble(value);
+            } else if(outputCategory.equals("change")) {
+                changeAmount += Double.parseDouble(value);
+            } else {
+                outputSum += Double.parseDouble(value);
+            }
+        }
+
+        double networkFee = inputSum - outputSum - changeAmount - blockIoFee;
+
+        NumberFormat format = new DecimalFormat();
+        format.setMinimumFractionDigits(8);
+
+        JSONObject response = new JSONObject();
+        response.put("network", data.get("network"));
+        response.put("network_fee", format.format(networkFee));
+        response.put("blockio_fee", format.format(blockIoFee));
+        response.put("total_amount_to_send", format.format(outputSum));
+
+        return response;
     }
 
     private NetworkParameters getNetwork(String networkString)

@@ -3,12 +3,10 @@ package lib;
 import org.bitcoinj.core.ECKey;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.FileReader;
-import java.io.IOException;
 import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -196,7 +194,20 @@ public class PrepareTransactionTest {
             blockIo.createAndSignTransaction(prepareTransactionResponse);
             fail();
         } catch(Exception ex) {
-            assertTrue(true);
+            assertEquals("Expected unsigned transaction ID mismatch. Please report this error to support@block.io.", ex.getMessage());
         }
+    }
+
+    @Test
+    void testSummarizePreparedTransaction() throws Exception {
+        JSONParser parser = new JSONParser();
+        JSONObject prepareTransactionResponse = (JSONObject) parser.parse(
+                new FileReader("src/test/resources/__files/json/prepare_transaction_response_with_blockio_fee_and_expected_unsigned_txid.json")
+        );;
+        JSONObject summarizedPreparedTransactionResponse = (JSONObject) parser.parse(
+                new FileReader("src/test/resources/__files/json/summarize_prepared_transaction_response_with_blockio_fee_and_expected_unsigned_txid.json")
+        );
+        JSONObject response = blockIo.summarizePreparedTransaction(prepareTransactionResponse);
+        assertEquals(response.toJSONString(), summarizedPreparedTransactionResponse.toJSONString());
     }
 }
