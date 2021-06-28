@@ -133,9 +133,10 @@ public class BlockIo {
 
             JSONObject curAddrData = new JSONObject();
             String curAddrType = curInputAddrData.get("address_type").toString();
+            int requiredSigs = Integer.parseInt(curInputAddrData.get("required_signatures").toString());
             JSONArray pubkeys = (JSONArray) curInputAddrData.get("public_keys");
 
-            curAddrData.put("required_signatures", curInputAddrData.get("required_signatures"));
+            curAddrData.put("required_signatures", requiredSigs);
             curAddrData.put("public_keys", pubkeys);
             curAddrData.put("address_type", curAddrType);
 
@@ -150,7 +151,7 @@ public class BlockIo {
             Script redeem;
 
             if(curAddrType.equals("P2WSH-over-P2SH") || curAddrType.equals("WITNESS_V0") || curAddrType.equals("P2SH")) {
-                redeem = ScriptBuilder.createMultiSigOutputScript(pubkeyList.size(), pubkeyList);
+                redeem = ScriptBuilder.createMultiSigOutputScript(requiredSigs, pubkeyList);
             } else if(curAddrType.equals("P2PKH") || curAddrType.equals("P2WPKH") || curAddrType.equals("P2WPKH-over-P2SH")) {
                 redeem = ScriptBuilder.createP2PKHOutputScript(pubkeyList.get(0));
             } else{
