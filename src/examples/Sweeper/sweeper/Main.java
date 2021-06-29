@@ -15,17 +15,26 @@ public class Main {
         dotenv = Dotenv.load();
         blockIo = new BlockIo(dotenv.get("API_KEY"));
         if((dotenv.get("TO_ADDRESS").equals("") || dotenv.get("TO_ADDRESS") == null) ||
-                (dotenv.get("PRIVATE_KEY_FROM_ADDRESS").equals("") || dotenv.get("PRIVATE_KEY_FROM_ADDRESS") == null) ||
-                (dotenv.get("FROM_ADDRESS").equals("") || dotenv.get("FROM_ADDRESS") == null)){
+                (dotenv.get("PRIVATE_KEY").equals("") || dotenv.get("PRIVATE_KEY") == null)){
 
             throw new Exception("Error: Missing parameters from env.");
         }
 
-        Map<String, Object> res = blockIo.PrepareSweepTransaction(new JSONObject(Map.of(
+        // prepare the transaction
+        JSONObject res = blockIo.PrepareSweepTransaction(new JSONObject(Map.of(
                 "to_address", dotenv.get("TO_ADDRESS"),
-                "private_key", dotenv.get("PRIVATE_KEY_FROM_ADDRESS"),
-                "from_address", dotenv.get("FROM_ADDRESS"))
-        ));
+                "private_key", dotenv.get("PRIVATE_KEY")
+        )));
+        // summarize the transaction
+        // inspect it in-depth yourself to ensure everything as you expect
+        System.out.println("Summarized Prepared Sweep Transaction: " + blockIo.SummarizePreparedTransaction(res));
+
+        // create and sign the transaction
+        res = blockIo.CreateAndSignTransaction(res);
+
+        // submit the final transaction to broadcast to the peer-to-peer blockchain network
+        res = blockIo.SubmitTransaction(new JSONObject(Map.of("transaction_data", res)));
+
 
         System.out.println("Sweep Res: " + res);
     }
