@@ -20,6 +20,11 @@ public class Main {
         DtrustAddressLabel = "dTrust1_witness_v0_3";
         blockIo = new BlockIo(dotenv.get("API_KEY"), dotenv.get("PIN"));
 
+        // WARNING: THIS IS JUST A DEMO
+        // private keys must always be generated using secure random number generators
+        // for instance, by using new Key(true)
+        // ofcourse, you will store the private keys yourself before using them anywhere
+
         PrivKeys = new ArrayList<>() {
             {
                 add(Key.extractKeyFromPassphraseString("verysecretkey1"));
@@ -29,6 +34,7 @@ public class Main {
             }
         };
 
+        // the public keys for our private keys
         PublicKeys = new ArrayList<>() {
             {
                 add(PrivKeys.get(0).getPublicKeyAsHex());
@@ -63,9 +69,11 @@ public class Main {
         // prepare the transaction
 
         res = blockIo.PrepareTransaction(new JSONObject(Map.of("from_labels", "default", "to_address", DtrustAddress, "amounts", "0.0003")));
+
         System.out.println("Summarized Prepared Transaction: " + blockIo.SummarizePreparedTransaction(res));
         // create and sign the transaction
         res = blockIo.CreateAndSignTransaction(res);
+
         // submit the transaction to Block.io for its signature and to broadcast to the peer-to-peer network
         res = blockIo.SubmitTransaction(new JSONObject(Map.of("transaction_data", res)));
         System.out.println("Withdrawal Response: " + res.get("data"));
@@ -80,9 +88,11 @@ public class Main {
 
         // prepare the dTrust transaction
         res = blockIo.PrepareDtrustTransaction(new JSONObject(Map.of("from_labels", DtrustAddressLabel, "to_address", normalAddress, "amounts", "0.0002" )));
+
         System.out.println("Summarized Prepared dTrust Transaction: " + blockIo.SummarizePreparedTransaction(res));
         // create and sign the transaction using just three keys (you can use all 4 keys to create the final transaction for broadcasting as well)
         res = blockIo.CreateAndSignTransaction(res, Arrays.copyOfRange(PrivKeys.stream().map(ECKey::getPrivateKeyAsHex).toArray(String[]::new), 0, 3));
+        
         // submit the transaction
         res = blockIo.SubmitTransaction(new JSONObject(Map.of("transaction_data", res)));
 

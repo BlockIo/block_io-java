@@ -24,21 +24,11 @@ It's super easy to get started. In your code, do this:
     // print all addresses on this account
     System.out.println(blockLib.GetMyAddresses(null));
 
-    // print the response of a withdrawal request
-    // 'SECRET_PIN' is only required if you did not specify it at 
-    // class initialization time.
-    Map<String, Object> res = blockLib.Withdraw(Map.of(
-            "pin", "secret_pin",
-            "from_labels", "label1, label2",
-            "to_label", "label3",
-            "amount", "50.0"
-        ));   
-
 ##### A note on passing json args to requests:
 
-Args are passed as a Map like this: 
+Args are passed as a Map wrapped in a JSONObject like this: 
 
-    Map.of("param1", "string", "param2", "intVal", "param3", "this, is, a, list")
+    new JSONObject(Map.of("param1", "string", "param2", "intVal", "param3", "this, is, a, list"))
 
 ## Testing
 
