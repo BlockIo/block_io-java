@@ -40,7 +40,7 @@ public class PrepareTransactionTest {
         JSONObject createAndSignTransactionResponse = (JSONObject) parser.parse(
                 new FileReader("src/test/resources/__files/json/create_and_sign_transaction_response_non_lowR.json")
         );
-        JSONObject response = blockIo.createAndSignTransaction(prepareTransactionResponse);
+        JSONObject response = blockIo.CreateAndSignTransaction(prepareTransactionResponse);
         assertEquals(response.toJSONString(), createAndSignTransactionResponse.toJSONString());
     }
 
@@ -53,7 +53,7 @@ public class PrepareTransactionTest {
         JSONObject createAndSignTransactionResponse = (JSONObject) parser.parse(
                 new FileReader("src/test/resources/__files/json/create_and_sign_transaction_response_sweep_p2wpkh_non_lowR.json")
         );
-        JSONObject response = blockIo.createAndSignTransaction(prepareTransactionResponse, sweepKeys);
+        JSONObject response = blockIo.CreateAndSignTransaction(prepareTransactionResponse, sweepKeys);
         assertEquals(response.toJSONString(), createAndSignTransactionResponse.toJSONString());
     }
 
@@ -66,7 +66,7 @@ public class PrepareTransactionTest {
         JSONObject createAndSignTransactionResponse = (JSONObject) parser.parse(
                 new FileReader("src/test/resources/__files/json/create_and_sign_transaction_response_sweep_p2wpkh_over_p2sh_non_lowR.json")
         );
-        JSONObject response = blockIo.createAndSignTransaction(prepareTransactionResponse, sweepKeys);
+        JSONObject response = blockIo.CreateAndSignTransaction(prepareTransactionResponse, sweepKeys);
         assertEquals(response.toJSONString(), createAndSignTransactionResponse.toJSONString());
     }
 
@@ -79,7 +79,7 @@ public class PrepareTransactionTest {
         JSONObject createAndSignTransactionResponse = (JSONObject) parser.parse(
                 new FileReader("src/test/resources/__files/json/create_and_sign_transaction_response_sweep_p2pkh_non_lowR.json")
         );
-        JSONObject response = blockIo.createAndSignTransaction(prepareTransactionResponse, sweepKeys);
+        JSONObject response = blockIo.CreateAndSignTransaction(prepareTransactionResponse, sweepKeys);
         assertEquals(response.toJSONString(), createAndSignTransactionResponse.toJSONString());
     }
 
@@ -92,7 +92,7 @@ public class PrepareTransactionTest {
         JSONObject createAndSignTransactionResponse = (JSONObject) parser.parse(
                 new FileReader("src/test/resources/__files/json/create_and_sign_transaction_response_dtrust_witness_v0_4_of_5_keys_non_lowR.json")
         );
-        JSONObject response = blockIo.createAndSignTransaction(prepareTransactionResponse, dtrustKeys);
+        JSONObject response = blockIo.CreateAndSignTransaction(prepareTransactionResponse, dtrustKeys);
         assertEquals(response.toJSONString(), createAndSignTransactionResponse.toJSONString());
     }
 
@@ -105,7 +105,7 @@ public class PrepareTransactionTest {
         JSONObject createAndSignTransactionResponse = (JSONObject) parser.parse(
                 new FileReader("src/test/resources/__files/json/create_and_sign_transaction_response_dtrust_witness_v0_3_of_5_keys_non_lowR.json")
         );
-        JSONObject response = blockIo.createAndSignTransaction(prepareTransactionResponse, Arrays.copyOfRange(dtrustKeys, 0, 3));
+        JSONObject response = blockIo.CreateAndSignTransaction(prepareTransactionResponse, Arrays.copyOfRange(dtrustKeys, 0, 3));
         assertEquals(response.toJSONString(), createAndSignTransactionResponse.toJSONString());
     }
 
@@ -118,7 +118,7 @@ public class PrepareTransactionTest {
         JSONObject createAndSignTransactionResponse = (JSONObject) parser.parse(
                 new FileReader("src/test/resources/__files/json/create_and_sign_transaction_response_dtrust_p2wsh_over_p2sh_4_of_5_keys_non_lowR.json")
         );
-        JSONObject response = blockIo.createAndSignTransaction(prepareTransactionResponse, dtrustKeys);
+        JSONObject response = blockIo.CreateAndSignTransaction(prepareTransactionResponse, dtrustKeys);
         assertEquals(response.toJSONString(), createAndSignTransactionResponse.toJSONString());
     }
 
@@ -131,7 +131,7 @@ public class PrepareTransactionTest {
         JSONObject createAndSignTransactionResponse = (JSONObject) parser.parse(
                 new FileReader("src/test/resources/__files/json/create_and_sign_transaction_response_dtrust_p2wsh_over_p2sh_3_of_5_keys_non_lowR.json")
         );
-        JSONObject response = blockIo.createAndSignTransaction(prepareTransactionResponse, Arrays.copyOfRange(dtrustKeys, 0, 3));
+        JSONObject response = blockIo.CreateAndSignTransaction(prepareTransactionResponse, Arrays.copyOfRange(dtrustKeys, 0, 3));
         assertEquals(response.toJSONString(), createAndSignTransactionResponse.toJSONString());
     }
 
@@ -144,7 +144,7 @@ public class PrepareTransactionTest {
         JSONObject createAndSignTransactionResponse = (JSONObject) parser.parse(
                 new FileReader("src/test/resources/__files/json/create_and_sign_transaction_response_dtrust_p2sh_4_of_5_keys_non_lowR.json")
         );
-        JSONObject response = blockIo.createAndSignTransaction(prepareTransactionResponse, dtrustKeys);
+        JSONObject response = blockIo.CreateAndSignTransaction(prepareTransactionResponse, dtrustKeys);
         assertEquals(response.toJSONString(), createAndSignTransactionResponse.toJSONString());
     }
 
@@ -157,7 +157,7 @@ public class PrepareTransactionTest {
         JSONObject createAndSignTransactionResponse = (JSONObject) parser.parse(
                 new FileReader("src/test/resources/__files/json/create_and_sign_transaction_response_dtrust_p2sh_3_of_5_keys_non_lowR.json")
         );
-        JSONObject response = blockIo.createAndSignTransaction(prepareTransactionResponse, Arrays.copyOfRange(dtrustKeys, 0, 3));
+        JSONObject response = blockIo.CreateAndSignTransaction(prepareTransactionResponse, Arrays.copyOfRange(dtrustKeys, 0, 3));
         assertEquals(response.toJSONString(), createAndSignTransactionResponse.toJSONString());
     }
 
@@ -170,7 +170,7 @@ public class PrepareTransactionTest {
         JSONObject createAndSignTransactionResponse = (JSONObject) parser.parse(
                 new FileReader("src/test/resources/__files/json/create_and_sign_transaction_response_dtrust_p2sh_3_of_5_keys_non_lowR.json")
         );
-        JSONObject response = blockIo.createAndSignTransaction(prepareTransactionResponse, new String[] {dtrustKeys[1], dtrustKeys[2], dtrustKeys[0]});
+        JSONObject response = blockIo.CreateAndSignTransaction(prepareTransactionResponse, new String[] {dtrustKeys[1], dtrustKeys[2], dtrustKeys[0]});
         assertEquals(response.toJSONString(), createAndSignTransactionResponse.toJSONString());
     }
 
@@ -183,7 +183,7 @@ public class PrepareTransactionTest {
         JSONObject createAndSignTransactionResponse = (JSONObject) parser.parse(
                 new FileReader("src/test/resources/__files/json/create_and_sign_transaction_response_with_blockio_fee_and_expected_unsigned_txid_non_lowR.json")
         );
-        JSONObject response = blockIo.createAndSignTransaction(prepareTransactionResponse);
+        JSONObject response = blockIo.CreateAndSignTransaction(prepareTransactionResponse);
         assertEquals(response.toJSONString(), createAndSignTransactionResponse.toJSONString());
 
         JSONObject dataObj = (JSONObject) prepareTransactionResponse.get("data");
@@ -191,7 +191,7 @@ public class PrepareTransactionTest {
         prepareTransactionResponse.put("data", dataObj);
 
         try{
-            blockIo.createAndSignTransaction(prepareTransactionResponse);
+            blockIo.CreateAndSignTransaction(prepareTransactionResponse);
             fail();
         } catch(Exception ex) {
             assertEquals("Expected unsigned transaction ID mismatch. Please report this error to support@block.io.", ex.getMessage());
@@ -207,7 +207,7 @@ public class PrepareTransactionTest {
         JSONObject summarizedPreparedTransactionResponse = (JSONObject) parser.parse(
                 new FileReader("src/test/resources/__files/json/summarize_prepared_transaction_response_with_blockio_fee_and_expected_unsigned_txid.json")
         );
-        JSONObject response = blockIo.summarizePreparedTransaction(prepareTransactionResponse);
+        JSONObject response = blockIo.SummarizePreparedTransaction(prepareTransactionResponse);
         assertEquals(response.toJSONString(), summarizedPreparedTransactionResponse.toJSONString());
     }
 }

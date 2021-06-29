@@ -139,6 +139,7 @@ class ClientMockTest {
                         .withBodyFile("json/success_response.json")));
     }
 
+    /*
     @Test
     void Withdraw() throws Exception {
         String pin = "blockiotestpininsecure";
@@ -160,4 +161,6 @@ class ClientMockTest {
         Map<String, Object> response = blockIo.WithdrawFromDtrustAddress(dTrustRequestBodyContent);
         assertNotNull(response);
     }
+
+     */
 }

@@ -2,6 +2,8 @@ package sweeper;
 
 import lib.BlockIo;
 import io.github.cdimascio.dotenv.Dotenv;
+import org.json.simple.JSONObject;
+
 import java.io.UnsupportedEncodingException;
 import java.util.Map;
 
@@ -19,11 +21,11 @@ public class Main {
             throw new Exception("Error: Missing parameters from env.");
         }
 
-        Map<String, Object> res = blockIo.SweepFromAddress(Map.of(
+        Map<String, Object> res = blockIo.PrepareSweepTransaction(new JSONObject(Map.of(
                 "to_address", dotenv.get("TO_ADDRESS"),
                 "private_key", dotenv.get("PRIVATE_KEY_FROM_ADDRESS"),
                 "from_address", dotenv.get("FROM_ADDRESS"))
-        );
+        ));
 
         System.out.println("Sweep Res: " + res);
     }
