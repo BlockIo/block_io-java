@@ -12,7 +12,6 @@ import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -28,18 +27,36 @@ public class Helper {
         return hash;
     }
 
-    public static String pinToAesKey(String pin) throws UnsupportedEncodingException {
+    public static String pinToAesKey(String pin) throws Exception {
+        return pinToAesKey(pin, "", 2048, 16, 32, "SHA256");
+    }
+    public static String pinToAesKey(String pin, String salt) throws Exception {
+        return pinToAesKey(pin, salt, 2048, 16, 32, "SHA256");
+    }
+    public static String pinToAesKey(String pin, String salt, int iterations) throws Exception {
+        return pinToAesKey(pin, salt, iterations, 16, 32, "SHA256");
+    }
+    public static String pinToAesKey(String pin, String salt, int iterations, int phase1_key_length) throws Exception {
+        return pinToAesKey(pin, salt, iterations, phase1_key_length, 32, "SHA256");
+    }
+    public static String pinToAesKey(String pin, String salt, int iterations, int phase1_key_length, int phase2_key_length) throws Exception {
+        return pinToAesKey(pin, salt, iterations, phase1_key_length, phase2_key_length, "SHA256");
+    }
+    public static String pinToAesKey(String pin, String salt, int iterations, int phase1_key_length, int phase2_key_length, String hash_function) throws Exception {
+
+        if (!hash_function.equals("SHA256"))
+            throw new Exception("Unknown hash function specified. Are you using current version of this library?");
 
         PKCS5S2ParametersGenerator gen = new PKCS5S2ParametersGenerator(new SHA256Digest());
 
         //round 1
-        gen.init(pin.getBytes("UTF-8"), new byte[0], 1024);
-        byte[] dk = ((KeyParameter) gen.generateDerivedParameters(128)).getKey();
+        gen.init(pin.getBytes("UTF-8"), salt.getBytes(StandardCharsets.UTF_8), iterations/2);
+        byte[] dk = ((KeyParameter) gen.generateDerivedParameters(phase1_key_length * 8)).getKey();
 
         //round 2
         String hexStr = Hex.toHexString(dk).toLowerCase();
-        gen.init(hexStr.getBytes(), new byte[0], 1024);
-        dk = ((KeyParameter) gen.generateDerivedParameters(256)).getKey();
+        gen.init(hexStr.getBytes(), salt.getBytes(StandardCharsets.UTF_8), iterations/2);
+        dk = ((KeyParameter) gen.generateDerivedParameters(phase2_key_length * 8)).getKey();
 
         return Base64.getEncoder().encodeToString(dk);
 

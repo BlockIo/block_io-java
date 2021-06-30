@@ -39,19 +39,19 @@ public class BlockIo {
     private NetworkParameters networkParams;
     HashMap<String, ECKey> userKeys;
 
-    public BlockIo(String apiKey) throws UnsupportedEncodingException {
+    public BlockIo(String apiKey) throws Exception {
         this(apiKey, null, 2, new Options());
     }
 
-    public BlockIo(String apiKey, String pin) throws UnsupportedEncodingException {
+    public BlockIo(String apiKey, String pin) throws Exception {
         this(apiKey, pin, 2, new Options());
     }
 
-    public BlockIo(String apiKey, String pin, int version) throws UnsupportedEncodingException {
+    public BlockIo(String apiKey, String pin, int version) throws Exception {
         this(apiKey, pin, version, new Options());
     }
 
-    public BlockIo(String apiKey, String pin, int version, Options opts ) throws UnsupportedEncodingException {
+    public BlockIo(String apiKey, String pin, int version, Options opts ) throws Exception {
         networkParams = null;
         userKeys = new HashMap<>();
 

@@ -13,6 +13,7 @@ import org.libdohj.params.LitecoinTestNet3Params;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -38,8 +39,17 @@ class HelperTest {
     }
 
     @Test
-    void pinToAesKey() throws UnsupportedEncodingException {
+    void pinToAesKey() throws Exception {
         assertEquals(controlAesKey, Helper.pinToAesKey(pin));
+    }
+
+    @Test
+    void pinToAesWithSalt() throws Exception {
+        String salt = "922445847c173e90667a19d90729e1fb";
+        String s_pin = "deadbeef";
+        String encryptionKey = Helper.pinToAesKey(s_pin, salt, 500000);
+        System.out.println("encryptionKey= " + encryptionKey);
+        assertEquals(Hex.toHexString(Base64.getDecoder().decode(encryptionKey)), "f206403c6bad20e1c8cb1f3318e17cec5b2da0560ed6c7b26826867452534172");
     }
 
     @Test
