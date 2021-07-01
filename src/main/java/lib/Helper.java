@@ -9,6 +9,8 @@ import org.bouncycastle.crypto.generators.PKCS5S2ParametersGenerator;
 import org.bouncycastle.crypto.params.KeyParameter;
 import org.bouncycastle.util.encoders.Hex;
 import javax.crypto.Cipher;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.ByteArrayOutputStream;
@@ -52,12 +54,12 @@ public class Helper {
 
         //round 1
         gen.init(pin.getBytes("UTF-8"), salt.getBytes(StandardCharsets.UTF_8), iterations/2);
-        byte[] dk = ((KeyParameter) gen.generateDerivedParameters(phase1_key_length * 8)).getKey();
+        byte[] dk = ((KeyParameter) gen.generateDerivedParameters(phase1_key_length * Byte.SIZE)).getKey();
 
         //round 2
         String hexStr = Hex.toHexString(dk).toLowerCase();
         gen.init(hexStr.getBytes(), salt.getBytes(StandardCharsets.UTF_8), iterations/2);
-        dk = ((KeyParameter) gen.generateDerivedParameters(phase2_key_length * 8)).getKey();
+        dk = ((KeyParameter) gen.generateDerivedParameters(phase2_key_length * Byte.SIZE)).getKey();
 
         return Base64.getEncoder().encodeToString(dk);
 
@@ -98,6 +100,20 @@ public class Helper {
             }
             else{
                 // AES-256-GCM
+                int AUTH_TAG_SIZE = 128; //16 bytes
+                int CIPHER_TEXT_SIZE = strToEncrypt.getBytes(StandardCharsets.UTF_8).length;
+
+                cipher = Cipher.getInstance("AES/GCM/NoPadding");
+                byte[] ivBytes = Hex.decode(iv);
+                SecretKey secretKey = new SecretKeySpec(key, "AES");
+                cipher.init(Cipher.ENCRYPT_MODE, secretKey, new GCMParameterSpec(AUTH_TAG_SIZE, ivBytes));
+                cipher.updateAAD(Hex.decode(auth_data));
+
+                byte[] cipherTextPlusAuthTag = cipher.doFinal(strToEncrypt.getBytes(StandardCharsets.UTF_8));
+                byte[] cipherText = Arrays.copyOfRange(cipherTextPlusAuthTag, 0, CIPHER_TEXT_SIZE);;
+                byte[] auth_tag = Arrays.copyOfRange(cipherTextPlusAuthTag, cipherTextPlusAuthTag.length - (AUTH_TAG_SIZE / Byte.SIZE), cipherTextPlusAuthTag.length);
+
+                return Base64.getEncoder().encodeToString(cipherText);
             }
         } catch (Exception e) {
             e.printStackTrace();
