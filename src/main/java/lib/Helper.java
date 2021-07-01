@@ -81,22 +81,24 @@ public class Helper {
             byte[] key = Base64.getDecoder().decode(secret);
             byte[] keyArrBytes32Value = Arrays.copyOf(key, 32);
             Cipher cipher = null;
-            if(cipher_type.equals("AES-256-ECB")) {
-                cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
-            } else if(cipher_type.equals("AES-256-CBC")) {
-                cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-            } else if(cipher_type.equals("AES-256-GCM")) {
-                //todo
-            } else {
-                throw new Exception("Unsupported cipher " + cipher_type);
+            if(!cipher_type.equals("AES-256-GCM")){
+                if(cipher_type.equals("AES-256-ECB")) {
+                    cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
+                } else if(cipher_type.equals("AES-256-CBC")) {
+                    cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+                } else {
+                    throw new Exception("Unsupported cipher " + cipher_type);
+                }
+                SecretKeySpec secretKeySpec = new SecretKeySpec(keyArrBytes32Value, "AES");
+                if(iv != null)
+                    cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec, new IvParameterSpec(Hex.decode(iv)));
+                else
+                    cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec);
+                return Base64.getEncoder().encodeToString(cipher.doFinal(strToEncrypt.getBytes(StandardCharsets.UTF_8)));
             }
-
-            SecretKeySpec secretKeySpec = new SecretKeySpec(keyArrBytes32Value, "AES");
-            if(iv != null)
-                cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec, new IvParameterSpec(Hex.decode(iv)));
-            else
-                cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec);
-            return Base64.getEncoder().encodeToString(cipher.doFinal(strToEncrypt.getBytes(StandardCharsets.UTF_8)));
+            else{
+                // AES-256-GCM
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -126,21 +128,24 @@ public class Helper {
             byte[] key = Base64.getDecoder().decode(secret);
             byte[] keyArrBytes32Value = Arrays.copyOf(key, 32);
             Cipher cipher = null;
-            if(cipher_type.equals("AES-256-ECB")) {
-                cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
-            } else if(cipher_type.equals("AES-256-CBC")) {
-                cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-            } else if(cipher_type.equals("AES-256-GCM")) {
-                //todo
-            } else {
-                throw new Exception("Unsupported cipher " + cipher_type);
+            if(!cipher_type.equals("AES-256-GCM")){
+                if(cipher_type.equals("AES-256-ECB")) {
+                    cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
+                } else if(cipher_type.equals("AES-256-CBC")) {
+                    cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+                } else {
+                    throw new Exception("Unsupported cipher " + cipher_type);
+                }
+                SecretKeySpec secretKeySpec = new SecretKeySpec(keyArrBytes32Value, "AES");
+                if(iv != null)
+                    cipher.init(Cipher.DECRYPT_MODE, secretKeySpec, new IvParameterSpec(Hex.decode(iv)));
+                else
+                    cipher.init(Cipher.DECRYPT_MODE, secretKeySpec);
+                return new String(cipher.doFinal(Base64.getDecoder().decode(strToDecrypt)), StandardCharsets.UTF_8);
             }
-            SecretKeySpec secretKeySpec = new SecretKeySpec(keyArrBytes32Value, "AES");
-            if(iv != null)
-                cipher.init(Cipher.DECRYPT_MODE, secretKeySpec, new IvParameterSpec(Hex.decode(iv)));
-            else
-                cipher.init(Cipher.DECRYPT_MODE, secretKeySpec);
-            return new String(cipher.doFinal(Base64.getDecoder().decode(strToDecrypt)), StandardCharsets.UTF_8);
+            else{
+                // AES-256-GCM
+            }
         }
         catch (Exception e)
         {
