@@ -53,13 +53,26 @@ class HelperTest {
     }
 
     @Test
-    void encrypt() {
+    void encryptWithAes256Ecb() {
         assertEquals(controlCipherText, Helper.encrypt(controlClearText, controlAesKey));
     }
 
     @Test
-    void decrypt() {
+    void decryptWithAes256Ecb() {
         assertEquals(controlClearText, Helper.decrypt(controlCipherText, controlAesKey));
+    }
+    @Test
+    void encryptWithAes256Ccb() throws Exception {
+        String encryptionKey = Helper.pinToAesKey("deadbeef", "922445847c173e90667a19d90729e1fb", 500000);
+        String encryptedData = Helper.encrypt("beadbeef", encryptionKey, "11bc22166c8cf8560e5fa7e5c622bb0f", "AES-256-CBC");
+        assertEquals(encryptedData, "LExu1rUAtIBOekslc328Lw==");
+    }
+
+    @Test
+    void decryptWithAes256Ccb() throws Exception {
+        String encryptionKey = Helper.pinToAesKey("deadbeef", "922445847c173e90667a19d90729e1fb", 500000);
+        String encryptedData = "LExu1rUAtIBOekslc328Lw==";
+        assertEquals(Helper.decrypt(encryptedData, encryptionKey, "11bc22166c8cf8560e5fa7e5c622bb0f",  "AES-256-CBC"), "beadbeef");
     }
     @Test
     void sha256Hash() throws NoSuchAlgorithmException {

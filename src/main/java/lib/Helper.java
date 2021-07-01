@@ -9,6 +9,7 @@ import org.bouncycastle.crypto.generators.PKCS5S2ParametersGenerator;
 import org.bouncycastle.crypto.params.KeyParameter;
 import org.bouncycastle.util.encoders.Hex;
 import javax.crypto.Cipher;
+import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -61,14 +62,40 @@ public class Helper {
         return Base64.getEncoder().encodeToString(dk);
 
     }
-    public static String encrypt(String strToEncrypt, String secret)
+
+    public static String encrypt(String strToEncrypt, String secret) {
+        return encrypt(strToEncrypt, secret, null, "AES-256-ECB", null);
+    }
+
+    public static String encrypt(String strToEncrypt, String secret, String iv) {
+        return encrypt(strToEncrypt, secret, iv, "AES-256-ECB", null);
+    }
+
+    public static String encrypt(String strToEncrypt, String secret, String iv, String cipher_type) {
+        return encrypt(strToEncrypt, secret, iv, cipher_type, null);
+    }
+
+    public static String encrypt(String strToEncrypt, String secret, String iv, String cipher_type, String auth_data)
     {
         try {
             byte[] key = Base64.getDecoder().decode(secret);
             byte[] keyArrBytes32Value = Arrays.copyOf(key, 32);
-            Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
+            Cipher cipher = null;
+            if(cipher_type.equals("AES-256-ECB")) {
+                cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
+            } else if(cipher_type.equals("AES-256-CBC")) {
+                cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+            } else if(cipher_type.equals("AES-256-GCM")) {
+                //todo
+            } else {
+                throw new Exception("Unsupported cipher " + cipher_type);
+            }
+
             SecretKeySpec secretKeySpec = new SecretKeySpec(keyArrBytes32Value, "AES");
-            cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec);
+            if(iv != null)
+                cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec, new IvParameterSpec(Hex.decode(iv)));
+            else
+                cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec);
             return Base64.getEncoder().encodeToString(cipher.doFinal(strToEncrypt.getBytes(StandardCharsets.UTF_8)));
         } catch (Exception e) {
             e.printStackTrace();
@@ -76,15 +103,43 @@ public class Helper {
         return null;
     }
 
-    public static String decrypt(String strToDecrypt, String secret)
-    {
+    public static String decrypt(String strToEncrypt, String secret) {
+        return decrypt(strToEncrypt, secret, null, "AES-256-ECB", null,null);
+    }
+
+    public static String decrypt(String strToEncrypt, String secret, String iv) {
+        return decrypt(strToEncrypt, secret, iv, "AES-256-ECB", null, null);
+    }
+
+    public static String decrypt(String strToEncrypt, String secret, String iv, String cipher_type) {
+        return decrypt(strToEncrypt, secret, iv, cipher_type, null, null);
+    }
+
+    public static String decrypt(String strToEncrypt, String secret, String iv, String cipher_type, String auth_tag) {
+        return decrypt(strToEncrypt, secret, iv, cipher_type, auth_tag, null);
+    }
+
+    public static String decrypt(String strToDecrypt, String secret, String iv, String cipher_type, String auth_tag, String auth_data)
+    { // encrypted_data, b64_enc_key, iv = nil, cipher_type = "AES-256-ECB", auth_tag = nil, auth_data = nil
         try
         {
             byte[] key = Base64.getDecoder().decode(secret);
             byte[] keyArrBytes32Value = Arrays.copyOf(key, 32);
-            Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
+            Cipher cipher = null;
+            if(cipher_type.equals("AES-256-ECB")) {
+                cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
+            } else if(cipher_type.equals("AES-256-CBC")) {
+                cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+            } else if(cipher_type.equals("AES-256-GCM")) {
+                //todo
+            } else {
+                throw new Exception("Unsupported cipher " + cipher_type);
+            }
             SecretKeySpec secretKeySpec = new SecretKeySpec(keyArrBytes32Value, "AES");
-            cipher.init(Cipher.DECRYPT_MODE, secretKeySpec);
+            if(iv != null)
+                cipher.init(Cipher.DECRYPT_MODE, secretKeySpec, new IvParameterSpec(Hex.decode(iv)));
+            else
+                cipher.init(Cipher.DECRYPT_MODE, secretKeySpec);
             return new String(cipher.doFinal(Base64.getDecoder().decode(strToDecrypt)), StandardCharsets.UTF_8);
         }
         catch (Exception e)
