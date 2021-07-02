@@ -141,10 +141,11 @@ public class Helper {
         return decrypt(strToEncrypt, secret, iv, cipher_type, auth_tag, null);
     }
 
-    public static String decrypt(String strToDecrypt, String secret, String iv, String cipher_type, String auth_tag, String auth_data) throws Exception { // encrypted_data, b64_enc_key, iv = nil, cipher_type = "AES-256-ECB", auth_tag = nil, auth_data = nil
+    public static String decrypt(String strToDecrypt, String secret, String iv, String cipher_type, String auth_tag, String auth_data) throws Exception {
+        // encrypted_data, b64_enc_key, iv = nil, cipher_type = "AES-256-ECB", auth_tag = nil, auth_data = nil
         byte[] key = Base64.getDecoder().decode(secret);
         byte[] keyArrBytes32Value = Arrays.copyOf(key, 32);
-        Cipher cipher = null;
+        Cipher cipher;
         if(!cipher_type.equals("AES-256-GCM")){
             if(cipher_type.equals("AES-256-ECB")) {
                 cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");

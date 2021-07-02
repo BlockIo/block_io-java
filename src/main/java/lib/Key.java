@@ -4,6 +4,7 @@ import com.google.common.base.Strings;
 import org.bitcoinj.core.Base58;
 import org.bitcoinj.core.ECKey;
 import org.bouncycastle.util.encoders.Hex;
+import org.json.simple.JSONObject;
 
 import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
@@ -31,12 +32,43 @@ public class Key extends ECKey {
         return ECKey.fromPrivate(extendedKeyBytes);
     }
 
+    public static ECKey dynamicExtractKey(JSONObject userKey, String secretPin) throws Exception{
+
+        JSONObject algorithm = (JSONObject) userKey.get("algorithm");
+
+        if(algorithm.isEmpty()) {
+            // use the legacy algorithm
+            algorithm = new JSONObject();
+            algorithm.put("pbkdf2_salt", "");
+            algorithm.put("pbkdf2_iterations", 2048);
+            algorithm.put("pbkdf2_hash_function", "SHA256");
+            algorithm.put("pbkdf2_phase1_key_length", 16);
+            algorithm.put("pbkdf2_phase2_key_length", 32);
+            algorithm.put("aes_iv", null);
+            algorithm.put("aes_cipher", "AES-256-ECB");
+            algorithm.put("aes_auth_tag", null);
+            algorithm.put("aes_auth_data", null);
+        }
+        // string pin, string salt = "", int iterations = 2048, int phase1_key_length = 16, int phase2_key_length = 32, string hash_function = "SHA256"
+        String B64Key = Helper.pinToAesKey(secretPin, algorithm.get("pbkdf2_salt").toString(),
+                                            Integer.parseInt(algorithm.get("pbkdf2_iterations").toString()),
+                                            Integer.parseInt(algorithm.get("pbkdf2_phase1_key_length").toString()),
+                                            Integer.parseInt(algorithm.get("pbkdf2_phase2_key_length").toString()),
+                                            algorithm.get("pbkdf2_hash_function").toString());
+        // string data, string key, string iv = null, string cipher_type = "AES-256-ECB", string auth_tag = null, string auth_data = null
+        String Decrypted = Helper.decrypt(userKey.get("encrypted_passphrase").toString(),
+                                            B64Key,
+                                            algorithm.get("aes_iv") == null ? null : algorithm.get("aes_iv").toString(),
+                                            algorithm.get("aes_cipher") == null ? null : algorithm.get("aes_cipher").toString(),
+                                            algorithm.get("aes_auth_tag") == null ? null : algorithm.get("aes_auth_tag").toString(),
+                                            algorithm.get("aes_auth_data") == null ? null : algorithm.get("aes_auth_data").toString());
+
+        return Key.extractKeyFromPassphrase(Decrypted);
+    }
+
     public static ECKey extractKeyFromEncryptedPassphrase(String encryptedData, String b64Key) throws Exception {
         String decrypted = Helper.decrypt(encryptedData, b64Key); // this returns a hex string
-        byte[] unHexlified = Hex.decode(decrypted);
-        byte[] hashed = Helper.sha256Hash(unHexlified);
-
-        return ECKey.fromPrivate(hashed);
+        return Key.extractKeyFromPassphrase(decrypted);
     }
     public static ECKey extractKeyFromPassphrase(String hexPass) throws NoSuchAlgorithmException {
         byte[] unHexlified = Hex.decode(hexPass);
