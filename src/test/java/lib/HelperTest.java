@@ -6,12 +6,12 @@ import org.bitcoinj.core.Transaction;
 import org.bitcoinj.script.Script;
 import org.bitcoinj.script.ScriptBuilder;
 import org.bouncycastle.util.encoders.Hex;
+import org.json.simple.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.libdohj.params.LitecoinTestNet3Params;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 
@@ -52,19 +52,20 @@ class HelperTest {
     }
 
     @Test
-    void encryptWithAes256Ecb() {
-        assertEquals(controlCipherText, Helper.encrypt(controlClearText, controlAesKey));
+    void encryptWithAes256Ecb() throws Exception {
+        JSONObject encryptedData = Helper.encrypt(controlClearText, controlAesKey);
+        assertEquals(controlCipherText, encryptedData.get("aes_cipher_text"));
     }
 
     @Test
-    void decryptWithAes256Ecb() {
+    void decryptWithAes256Ecb() throws Exception {
         assertEquals(controlClearText, Helper.decrypt(controlCipherText, controlAesKey));
     }
     @Test
     void encryptWithAes256Cbc() throws Exception {
         String encryptionKey = Helper.pinToAesKey("deadbeef", "922445847c173e90667a19d90729e1fb", 500000);
-        String encryptedData = Helper.encrypt("beadbeef", encryptionKey, "11bc22166c8cf8560e5fa7e5c622bb0f", "AES-256-CBC");
-        assertEquals(encryptedData, "LExu1rUAtIBOekslc328Lw==");
+        JSONObject encryptedData = Helper.encrypt("beadbeef", encryptionKey, "11bc22166c8cf8560e5fa7e5c622bb0f", "AES-256-CBC");
+        assertEquals(encryptedData.get("aes_cipher_text"), "LExu1rUAtIBOekslc328Lw==");
     }
 
     @Test
@@ -77,8 +78,9 @@ class HelperTest {
     @Test
     void encryptWithAes256Gcm() throws Exception {
         String encryptionKey = Helper.pinToAesKey("deadbeef", "922445847c173e90667a19d90729e1fb", 500000);
-        String encryptedData = Helper.encrypt("beadbeef", encryptionKey, "a57414b88b67f977829cbdca", "AES-256-GCM", "");
-        assertEquals(encryptedData, "ELV56Z57KoA=");
+        JSONObject encryptedData = Helper.encrypt("beadbeef", encryptionKey, "a57414b88b67f977829cbdca", "AES-256-GCM", "");
+        assertEquals(encryptedData.get("aes_auth_tag"), "adeb7dfe53027bdda5824dc524d5e55a");
+        assertEquals(encryptedData.get("aes_cipher_text"), "ELV56Z57KoA=");
     }
     @Test
     void decryptWithAes256Gcm() throws Exception {
@@ -86,6 +88,18 @@ class HelperTest {
         String encryptedData = "ELV56Z57KoA=";
         String authTag = "adeb7dfe53027bdda5824dc524d5e55a";
         assertEquals(Helper.decrypt(encryptedData, encryptionKey, "a57414b88b67f977829cbdca", "AES-256-GCM", authTag, ""), "beadbeef");
+    }
+    @Test
+    void decryptWithAes256SmallAuthTag() throws Exception {
+        String encryptionKey = Helper.pinToAesKey("deadbeef", "922445847c173e90667a19d90729e1fb", 500000);
+        String encryptedData = "ELV56Z57KoA=";
+        String authTag = "adeb7dfe53027bdda5824dc524d5e5";
+        try{
+            Helper.decrypt(encryptedData, encryptionKey, "a57414b88b67f977829cbdca", "AES-256-GCM", authTag, "");
+            fail();
+        } catch(Exception ex) {
+            assertEquals("Auth tag must be 16 bytes exactly.", ex.getMessage());
+        }
     }
     @Test
     void sha256Hash() throws NoSuchAlgorithmException {

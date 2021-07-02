@@ -31,7 +31,7 @@ public class Key extends ECKey {
         return ECKey.fromPrivate(extendedKeyBytes);
     }
 
-    public static ECKey extractKeyFromEncryptedPassphrase(String encryptedData, String b64Key) throws NoSuchAlgorithmException {
+    public static ECKey extractKeyFromEncryptedPassphrase(String encryptedData, String b64Key) throws Exception {
         String decrypted = Helper.decrypt(encryptedData, b64Key); // this returns a hex string
         byte[] unHexlified = Hex.decode(decrypted);
         byte[] hashed = Helper.sha256Hash(unHexlified);

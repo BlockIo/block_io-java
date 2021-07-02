@@ -8,8 +8,9 @@ import org.bouncycastle.crypto.digests.SHA256Digest;
 import org.bouncycastle.crypto.generators.PKCS5S2ParametersGenerator;
 import org.bouncycastle.crypto.params.KeyParameter;
 import org.bouncycastle.util.encoders.Hex;
-import javax.crypto.Cipher;
-import javax.crypto.SecretKey;
+import org.json.simple.JSONObject;
+
+import javax.crypto.*;
 import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
@@ -66,133 +67,125 @@ public class Helper {
 
     }
 
-    public static String encrypt(String strToEncrypt, String secret) {
+    public static JSONObject encrypt(String strToEncrypt, String secret) throws Exception {
         return encrypt(strToEncrypt, secret, null, "AES-256-ECB", null);
     }
 
-    public static String encrypt(String strToEncrypt, String secret, String iv) {
+    public static JSONObject encrypt(String strToEncrypt, String secret, String iv) throws Exception {
         return encrypt(strToEncrypt, secret, iv, "AES-256-ECB", null);
     }
 
-    public static String encrypt(String strToEncrypt, String secret, String iv, String cipher_type) {
+    public static JSONObject encrypt(String strToEncrypt, String secret, String iv, String cipher_type) throws Exception {
         return encrypt(strToEncrypt, secret, iv, cipher_type, null);
     }
 
-    public static String encrypt(String strToEncrypt, String secret, String iv, String cipher_type, String auth_data)
-    {
-        try {
-            byte[] key = Base64.getDecoder().decode(secret);
-            byte[] keyArrBytes32Value = Arrays.copyOf(key, 32);
-            Cipher cipher = null;
-            if(!cipher_type.equals("AES-256-GCM")){
-                if(cipher_type.equals("AES-256-ECB")) {
-                    cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
-                } else if(cipher_type.equals("AES-256-CBC")) {
-                    cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-                } else {
-                    throw new Exception("Unsupported cipher " + cipher_type);
-                }
-                SecretKeySpec secretKeySpec = new SecretKeySpec(keyArrBytes32Value, "AES");
-                if(iv != null)
-                    cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec, new IvParameterSpec(Hex.decode(iv)));
-                else
-                    cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec);
-                return Base64.getEncoder().encodeToString(cipher.doFinal(strToEncrypt.getBytes(StandardCharsets.UTF_8)));
+    public static JSONObject encrypt(String strToEncrypt, String secret, String iv, String cipher_type, String auth_data) throws Exception {
+        JSONObject response = new JSONObject();
+        response.put("aes_iv", iv);
+        response.put("aes_cipher", cipher_type);
+        response.put("aes_auth_data", auth_data);
+
+        byte[] key = Base64.getDecoder().decode(secret);
+        byte[] keyArrBytes32Value = Arrays.copyOf(key, 32);
+        Cipher cipher = null;
+        if(!cipher_type.equals("AES-256-GCM")){
+            if(cipher_type.equals("AES-256-ECB")) {
+                cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
+            } else if(cipher_type.equals("AES-256-CBC")) {
+                cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+            } else {
+                throw new Exception("Unsupported cipher " + cipher_type);
             }
-            else{
-                // AES-256-GCM
-                int AUTH_TAG_SIZE = 128; //16 bytes
-                int CIPHER_TEXT_SIZE = strToEncrypt.getBytes(StandardCharsets.UTF_8).length;
-
-                cipher = Cipher.getInstance("AES/GCM/NoPadding");
-                byte[] ivBytes = Hex.decode(iv);
-                SecretKey secretKey = new SecretKeySpec(key, "AES");
-                cipher.init(Cipher.ENCRYPT_MODE, secretKey, new GCMParameterSpec(AUTH_TAG_SIZE, ivBytes));
-                cipher.updateAAD(Hex.decode(auth_data));
-
-                byte[] cipherTextPlusAuthTag = cipher.doFinal(strToEncrypt.getBytes(StandardCharsets.UTF_8));
-                byte[] cipherText = Arrays.copyOfRange(cipherTextPlusAuthTag, 0, CIPHER_TEXT_SIZE);;
-                byte[] auth_tag = Arrays.copyOfRange(cipherTextPlusAuthTag, cipherTextPlusAuthTag.length - (AUTH_TAG_SIZE / Byte.SIZE), cipherTextPlusAuthTag.length);
-
-//                System.out.println(Hex.toHexString(auth_tag));
-                return Base64.getEncoder().encodeToString(cipherText);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
+            SecretKeySpec secretKeySpec = new SecretKeySpec(keyArrBytes32Value, "AES");
+            if(iv != null)
+                cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec, new IvParameterSpec(Hex.decode(iv)));
+            else
+                cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec);
+            response.put("aes_cipher_text", Base64.getEncoder().encodeToString(cipher.doFinal(strToEncrypt.getBytes(StandardCharsets.UTF_8))));
+            response.put("aes_auth_tag", null);
         }
-        return null;
+        else{
+            // AES-256-GCM
+            int AUTH_TAG_SIZE = 128; //16 bytes
+            int CIPHER_TEXT_SIZE = strToEncrypt.getBytes(StandardCharsets.UTF_8).length;
+
+            cipher = Cipher.getInstance("AES/GCM/NoPadding");
+            byte[] ivBytes = Hex.decode(iv);
+            SecretKey secretKey = new SecretKeySpec(key, "AES");
+            cipher.init(Cipher.ENCRYPT_MODE, secretKey, new GCMParameterSpec(AUTH_TAG_SIZE, ivBytes));
+            cipher.updateAAD(Hex.decode(auth_data));
+
+            byte[] cipherTextPlusAuthTag = cipher.doFinal(strToEncrypt.getBytes(StandardCharsets.UTF_8));
+            byte[] cipherText = Arrays.copyOfRange(cipherTextPlusAuthTag, 0, CIPHER_TEXT_SIZE);;
+            byte[] auth_tag = Arrays.copyOfRange(cipherTextPlusAuthTag, cipherTextPlusAuthTag.length - (AUTH_TAG_SIZE / Byte.SIZE), cipherTextPlusAuthTag.length);
+
+            response.put("aes_cipher_text", Base64.getEncoder().encodeToString(cipherText));
+            response.put("aes_auth_tag", Hex.toHexString(auth_tag));
+        }
+        return response;
     }
 
-    public static String decrypt(String strToEncrypt, String secret) {
+    public static String decrypt(String strToEncrypt, String secret) throws Exception {
         return decrypt(strToEncrypt, secret, null, "AES-256-ECB", null,null);
     }
 
-    public static String decrypt(String strToEncrypt, String secret, String iv) {
+    public static String decrypt(String strToEncrypt, String secret, String iv) throws Exception {
         return decrypt(strToEncrypt, secret, iv, "AES-256-ECB", null, null);
     }
 
-    public static String decrypt(String strToEncrypt, String secret, String iv, String cipher_type) {
+    public static String decrypt(String strToEncrypt, String secret, String iv, String cipher_type) throws Exception {
         return decrypt(strToEncrypt, secret, iv, cipher_type, null, null);
     }
 
-    public static String decrypt(String strToEncrypt, String secret, String iv, String cipher_type, String auth_tag) {
+    public static String decrypt(String strToEncrypt, String secret, String iv, String cipher_type, String auth_tag) throws Exception {
         return decrypt(strToEncrypt, secret, iv, cipher_type, auth_tag, null);
     }
 
-    public static String decrypt(String strToDecrypt, String secret, String iv, String cipher_type, String auth_tag, String auth_data)
-    { // encrypted_data, b64_enc_key, iv = nil, cipher_type = "AES-256-ECB", auth_tag = nil, auth_data = nil
-        try
-        {
-            byte[] key = Base64.getDecoder().decode(secret);
-            byte[] keyArrBytes32Value = Arrays.copyOf(key, 32);
-            Cipher cipher = null;
-            if(!cipher_type.equals("AES-256-GCM")){
-                if(cipher_type.equals("AES-256-ECB")) {
-                    cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
-                } else if(cipher_type.equals("AES-256-CBC")) {
-                    cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-                } else {
-                    throw new Exception("Unsupported cipher " + cipher_type);
-                }
-                SecretKeySpec secretKeySpec = new SecretKeySpec(keyArrBytes32Value, "AES");
-                if(iv != null)
-                    cipher.init(Cipher.DECRYPT_MODE, secretKeySpec, new IvParameterSpec(Hex.decode(iv)));
-                else
-                    cipher.init(Cipher.DECRYPT_MODE, secretKeySpec);
-                return new String(cipher.doFinal(Base64.getDecoder().decode(strToDecrypt)), StandardCharsets.UTF_8);
+    public static String decrypt(String strToDecrypt, String secret, String iv, String cipher_type, String auth_tag, String auth_data) throws Exception { // encrypted_data, b64_enc_key, iv = nil, cipher_type = "AES-256-ECB", auth_tag = nil, auth_data = nil
+        byte[] key = Base64.getDecoder().decode(secret);
+        byte[] keyArrBytes32Value = Arrays.copyOf(key, 32);
+        Cipher cipher = null;
+        if(!cipher_type.equals("AES-256-GCM")){
+            if(cipher_type.equals("AES-256-ECB")) {
+                cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
+            } else if(cipher_type.equals("AES-256-CBC")) {
+                cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+            } else {
+                throw new Exception("Unsupported cipher " + cipher_type);
             }
-            else{
-                // AES-256-GCM
-                if (auth_tag.length() != 32)
-                    throw new Exception("Auth tag must be 16 bytes exactly.");
-
-                int AUTH_TAG_SIZE = 128; //16 bytes
-                byte[] authTag = Hex.decode(auth_tag);
-                byte[] ivBytes = Hex.decode(iv);
-                byte[] cipherText = Base64.getDecoder().decode(strToDecrypt);
-
-                ByteBuffer byteBuffer = ByteBuffer.allocate(cipherText.length + authTag.length + ivBytes.length);
-                byteBuffer.put(ivBytes);
-                byteBuffer.put(cipherText);
-                byteBuffer.put(authTag);
-
-                byte[] bytesToDecrypt = byteBuffer.array();
-
-                cipher = Cipher.getInstance("AES/GCM/NoPadding");
-                SecretKey secretKey = new SecretKeySpec(key, "AES");
-                cipher.init(Cipher.DECRYPT_MODE, secretKey, new GCMParameterSpec(AUTH_TAG_SIZE, bytesToDecrypt, 0, ivBytes.length));
-                cipher.updateAAD(Hex.decode(auth_data));
-
-                byte[] plainText = cipher.doFinal(bytesToDecrypt, ivBytes.length, bytesToDecrypt.length - ivBytes.length);
-
-                return new String(plainText, StandardCharsets.UTF_8);
-            }
+            SecretKeySpec secretKeySpec = new SecretKeySpec(keyArrBytes32Value, "AES");
+            if(iv != null)
+                cipher.init(Cipher.DECRYPT_MODE, secretKeySpec, new IvParameterSpec(Hex.decode(iv)));
+            else
+                cipher.init(Cipher.DECRYPT_MODE, secretKeySpec);
+            return new String(cipher.doFinal(Base64.getDecoder().decode(strToDecrypt)), StandardCharsets.UTF_8);
         }
-        catch (Exception e)
-        {
-            System.out.println("Error while decrypting: " + e.toString());
+        else{
+            // AES-256-GCM
+            if (auth_tag.length() != 32)
+                throw new Exception("Auth tag must be 16 bytes exactly.");
+
+            int AUTH_TAG_SIZE = 128; //16 bytes
+            byte[] authTag = Hex.decode(auth_tag);
+            byte[] ivBytes = Hex.decode(iv);
+            byte[] cipherText = Base64.getDecoder().decode(strToDecrypt);
+
+            ByteBuffer byteBuffer = ByteBuffer.allocate(cipherText.length + authTag.length + ivBytes.length);
+            byteBuffer.put(ivBytes);
+            byteBuffer.put(cipherText);
+            byteBuffer.put(authTag);
+
+            byte[] bytesToDecrypt = byteBuffer.array();
+
+            cipher = Cipher.getInstance("AES/GCM/NoPadding");
+            SecretKey secretKey = new SecretKeySpec(key, "AES");
+            cipher.init(Cipher.DECRYPT_MODE, secretKey, new GCMParameterSpec(AUTH_TAG_SIZE, bytesToDecrypt, 0, ivBytes.length));
+            cipher.updateAAD(Hex.decode(auth_data));
+
+            byte[] plainText = cipher.doFinal(bytesToDecrypt, ivBytes.length, bytesToDecrypt.length - ivBytes.length);
+
+            return new String(plainText, StandardCharsets.UTF_8);
         }
-        return null;
     }
 
     public static String signInputs(ECKey k, String dataToSign, String pubKeyToVerify){
