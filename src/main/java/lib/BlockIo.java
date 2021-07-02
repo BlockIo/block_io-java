@@ -156,21 +156,24 @@ public class BlockIo {
         }
 
         if(keys.length > 0) {
-            for(String key : keys) {
+             // user provided some keys, let's index them
+                for(String key : keys) {
                 ECKey userKey = Key.fromHex(key);
                 userKeys.put(userKey.getPublicKeyAsHex(), userKey);
             }
         }
 
         if(dataObj.containsKey("user_key") && !userKeys.containsKey(((JSONObject)dataObj.get("user_key")).get("public_key").toString())){
-            if(Pin != null) {
-                String encryptionKey = Helper.pinToAesKey(Pin);
+             // we don't have the key to sign for transaction yet
+                if(Pin != null) {
+                // use the user_key to extract private key dynamically
                 String pubkeyStr = ((JSONObject)dataObj.get("user_key")).get("public_key").toString();
-                ECKey key = Key.extractKeyFromEncryptedPassphrase(((JSONObject)dataObj.get("user_key")).get("encrypted_passphrase").toString(), encryptionKey);
+                ECKey key = Key.dynamicExtractKey((JSONObject)dataObj.get("user_key"), Pin);
 
                 if(!key.getPublicKeyAsHex().equals(pubkeyStr)) {
                     throw new Exception("Fail: Invalid Secret PIN provided.");
                 }
+                // we have the key, let's save it for later use
                 userKeys.put(pubkeyStr, key);
             } else {
                 throw new Exception("Fail: No PIN provided to decrypt private key.");

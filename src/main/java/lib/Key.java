@@ -34,7 +34,7 @@ public class Key extends ECKey {
 
     public static ECKey dynamicExtractKey(JSONObject userKey, String secretPin) throws Exception{
 
-        JSONObject algorithm = (JSONObject) userKey.get("algorithm");
+        JSONObject algorithm = userKey.get("algorithm") == null ? new JSONObject() : (JSONObject) userKey.get("algorithm");
 
         if(algorithm.isEmpty()) {
             // use the legacy algorithm
