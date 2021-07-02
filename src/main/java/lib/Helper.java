@@ -15,6 +15,7 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -113,6 +114,7 @@ public class Helper {
                 byte[] cipherText = Arrays.copyOfRange(cipherTextPlusAuthTag, 0, CIPHER_TEXT_SIZE);;
                 byte[] auth_tag = Arrays.copyOfRange(cipherTextPlusAuthTag, cipherTextPlusAuthTag.length - (AUTH_TAG_SIZE / Byte.SIZE), cipherTextPlusAuthTag.length);
 
+//                System.out.println(Hex.toHexString(auth_tag));
                 return Base64.getEncoder().encodeToString(cipherText);
             }
         } catch (Exception e) {
@@ -161,6 +163,29 @@ public class Helper {
             }
             else{
                 // AES-256-GCM
+                if (auth_tag.length() != 32)
+                    throw new Exception("Auth tag must be 16 bytes exactly.");
+
+                int AUTH_TAG_SIZE = 128; //16 bytes
+                byte[] authTag = Hex.decode(auth_tag);
+                byte[] ivBytes = Hex.decode(iv);
+                byte[] cipherText = Base64.getDecoder().decode(strToDecrypt);
+
+                ByteBuffer byteBuffer = ByteBuffer.allocate(cipherText.length + authTag.length + ivBytes.length);
+                byteBuffer.put(ivBytes);
+                byteBuffer.put(cipherText);
+                byteBuffer.put(authTag);
+
+                byte[] bytesToDecrypt = byteBuffer.array();
+
+                cipher = Cipher.getInstance("AES/GCM/NoPadding");
+                SecretKey secretKey = new SecretKeySpec(key, "AES");
+                cipher.init(Cipher.DECRYPT_MODE, secretKey, new GCMParameterSpec(AUTH_TAG_SIZE, bytesToDecrypt, 0, ivBytes.length));
+                cipher.updateAAD(Hex.decode(auth_data));
+
+                byte[] plainText = cipher.doFinal(bytesToDecrypt, ivBytes.length, bytesToDecrypt.length - ivBytes.length);
+
+                return new String(plainText, StandardCharsets.UTF_8);
             }
         }
         catch (Exception e)

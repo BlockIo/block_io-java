@@ -48,7 +48,6 @@ class HelperTest {
         String salt = "922445847c173e90667a19d90729e1fb";
         String s_pin = "deadbeef";
         String encryptionKey = Helper.pinToAesKey(s_pin, salt, 500000);
-        System.out.println("encryptionKey= " + encryptionKey);
         assertEquals(Hex.toHexString(Base64.getDecoder().decode(encryptionKey)), "f206403c6bad20e1c8cb1f3318e17cec5b2da0560ed6c7b26826867452534172");
     }
 
@@ -80,6 +79,13 @@ class HelperTest {
         String encryptionKey = Helper.pinToAesKey("deadbeef", "922445847c173e90667a19d90729e1fb", 500000);
         String encryptedData = Helper.encrypt("beadbeef", encryptionKey, "a57414b88b67f977829cbdca", "AES-256-GCM", "");
         assertEquals(encryptedData, "ELV56Z57KoA=");
+    }
+    @Test
+    void decryptWithAes256Gcm() throws Exception {
+        String encryptionKey = Helper.pinToAesKey("deadbeef", "922445847c173e90667a19d90729e1fb", 500000);
+        String encryptedData = "ELV56Z57KoA=";
+        String authTag = "adeb7dfe53027bdda5824dc524d5e55a";
+        assertEquals(Helper.decrypt(encryptedData, encryptionKey, "a57414b88b67f977829cbdca", "AES-256-GCM", authTag, ""), "beadbeef");
     }
     @Test
     void sha256Hash() throws NoSuchAlgorithmException {
