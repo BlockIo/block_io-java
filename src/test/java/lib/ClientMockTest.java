@@ -1,25 +1,16 @@
 package lib;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.WireMockServer;
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-import lib.BlockIo;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.Map;
-import java.util.Scanner;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 class ClientMockTest {
     private String api_key;
@@ -102,7 +93,7 @@ class ClientMockTest {
 
         wireMockServer.stubFor(post(urlPathEqualTo("/api/v2/sign_and_finalize_withdrawal"))
                 .withHeader("Accept", containing("application/json"))
-                .withRequestBody(equalToJson(new Gson().toJson(signAndFinalizeWithdraw), true, true))
+                .withRequestBody(equalToJson(signAndFinalizeWithdraw.toJSONString(), true, true))
                 .willReturn(aResponse().withHeader("Content-Type", "application/json")
                         .withStatus(200)
                         .withHeader("Accept", "application/json")
@@ -117,7 +108,7 @@ class ClientMockTest {
 
         wireMockServer.stubFor(post(urlPathEqualTo("/api/v2/sign_and_finalize_sweep"))
                 .withHeader("Accept", containing("application/json"))
-                .withRequestBody(equalToJson(new Gson().toJson(signAndFinalizeSweep), true, true))
+                .withRequestBody(equalToJson(signAndFinalizeSweep.toJSONString(), true, true))
                 .willReturn(aResponse().withHeader("Content-Type", "application/json")
                         .withStatus(200)
                         .withHeader("Accept", "application/json")
@@ -132,7 +123,7 @@ class ClientMockTest {
 
         wireMockServer.stubFor(post(urlPathEqualTo("/api/v2/sign_and_finalize_withdrawal"))
                 .withHeader("Accept", containing("application/json"))
-                .withRequestBody(equalToJson(new Gson().toJson(signAndFinalizeDtrust), true, true))
+                .withRequestBody(equalToJson(signAndFinalizeDtrust.toJSONString(), true, true))
                 .willReturn(aResponse().withHeader("Content-Type", "application/json")
                         .withStatus(200)
                         .withHeader("Accept", "application/json")

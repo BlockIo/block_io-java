@@ -15,7 +15,6 @@ import org.libdohj.params.LitecoinMainNetParams;
 import org.libdohj.params.LitecoinTestNet3Params;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.*;
