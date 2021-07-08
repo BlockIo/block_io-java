@@ -35,6 +35,7 @@ public class BlockIo {
     private String DefaultServer = "" ;
     private String DefaultPort = "";
     private String Host = "block.io";
+    private String UserAgent;
     private NetworkParameters networkParams;
     HashMap<String, ECKey> userKeys;
 
@@ -53,6 +54,9 @@ public class BlockIo {
     public BlockIo(String apiKey, String pin, int version, Options opts ) throws Exception {
         networkParams = null;
         userKeys = new HashMap<>();
+
+        String libVersion = getClass().getPackage().getImplementationVersion();
+        UserAgent = String.join(":", "java", "block_io", libVersion);
 
         Opts = opts;
         Pin = pin == null || pin.equals("") ? null : pin;
@@ -361,6 +365,7 @@ public class BlockIo {
 
     private String get(String path) throws IOException {
         Request request = new Request.Builder()
+                .addHeader("User-Agent", UserAgent)
                 .url(constructUrl(path))
                 .build();
 
@@ -379,6 +384,7 @@ public class BlockIo {
         Request request = new Request.Builder()
                 .url(constructUrl(path))
                 .addHeader("Accept", "application/json")
+                .addHeader("User-Agent", UserAgent)
                 .post(body)
                 .build();
         Response response = RestClient.newCall(request).execute();
@@ -398,191 +404,191 @@ public class BlockIo {
     // Passthrough methods
 
     public JSONObject GetNewAddress(JSONObject args) throws Exception { 
-        String argsJson = args.toJSONString();
+        String argsJson = args != null ? args.toJSONString() : "";
         return _request("POST", "get_new_address", argsJson);
     }
     public JSONObject GetBalance(JSONObject args) throws Exception { 
-        String argsJson = args.toJSONString();
+        String argsJson = args != null ? args.toJSONString() : "";
         return _request("GET", "get_balance", argsJson);
     }
     public JSONObject GetMyAddresses(JSONObject args) throws Exception { 
-        String argsJson = args.toJSONString();
+        String argsJson = args != null ? args.toJSONString() : "";
         return _request("POST", "get_my_addresses", argsJson);
     }
     public JSONObject GetAddressReceived(JSONObject args) throws Exception { 
-        String argsJson = args.toJSONString();
+        String argsJson = args != null ? args.toJSONString() : "";
         return _request("POST", "get_address_received", argsJson);
     }
     public JSONObject GetAddressByLabel(JSONObject args) throws Exception { 
-        String argsJson = args.toJSONString();
+        String argsJson = args != null ? args.toJSONString() : "";
         return _request("POST", "get_address_by_label", argsJson);
     }
     public JSONObject GetAddressBalance(JSONObject args) throws Exception { 
-        String argsJson = args.toJSONString();
+        String argsJson = args != null ? args.toJSONString() : "";
         return _request("POST", "get_address_balance", argsJson);
     }
     public JSONObject CreateUser(JSONObject args) throws Exception { 
-        String argsJson = args.toJSONString();
+        String argsJson = args != null ? args.toJSONString() : "";
         return _request("POST", "create_user", argsJson);
     }
     public JSONObject GetUsers(JSONObject args) throws Exception { 
-        String argsJson = args.toJSONString();
+        String argsJson = args != null ? args.toJSONString() : "";
         return _request("POST", "get_users", argsJson);
     }
     public JSONObject GetUserBalance(JSONObject args) throws Exception { 
-        String argsJson = args.toJSONString();
+        String argsJson = args != null ? args.toJSONString() : "";
         return _request("POST", "get_user_balance", argsJson);
     }
     public JSONObject GetUserAddress(JSONObject args) throws Exception { 
-        String argsJson = args.toJSONString();
+        String argsJson = args != null ? args.toJSONString() : "";
         return _request("POST", "get_user_address", argsJson);
     }
     public JSONObject GetUserReceived(JSONObject args) throws Exception { 
-        String argsJson = args.toJSONString();
+        String argsJson = args != null ? args.toJSONString() : "";
         return _request("POST", "get_user_received", argsJson);
     }
     public JSONObject GetTransactions(JSONObject args) throws Exception { 
-        String argsJson = args.toJSONString();
+        String argsJson = args != null ? args.toJSONString() : "";
         return _request("POST", "get_transactions", argsJson);
     }
     public JSONObject GetNewDtrustAddress(JSONObject args) throws Exception { 
-        String argsJson = args.toJSONString();
+        String argsJson = args != null ? args.toJSONString() : "";
         return _request("POST", "get_new_dtrust_address", argsJson);
     }
     public JSONObject GetMyDtrustAddresses(JSONObject args) throws Exception { 
-        String argsJson = args.toJSONString();
+        String argsJson = args != null ? args.toJSONString() : "";
         return _request("POST", "get_my_dtrust_addresses", argsJson);
     }
     public JSONObject GetDtrustAddressByLabel(JSONObject args) throws Exception { 
-        String argsJson = args.toJSONString();
+        String argsJson = args != null ? args.toJSONString() : "";
         return _request("POST", "get_dtrust_address_by_label", argsJson);
     }
     public JSONObject GetDtrustTransactions(JSONObject args) throws Exception { 
-        String argsJson = args.toJSONString();
+        String argsJson = args != null ? args.toJSONString() : "";
         return _request("POST", "get_dtrust_transactions", argsJson);
     }
     public JSONObject GetDtrustAddressBalance(JSONObject args) throws Exception { 
-        String argsJson = args.toJSONString();
+        String argsJson = args != null ? args.toJSONString() : "";
         return _request("POST", "get_dtrust_address_balance", argsJson);
     }
     public JSONObject GetNetworkFeeEstimate(JSONObject args) throws Exception { 
-        String argsJson = args.toJSONString();
+        String argsJson = args != null ? args.toJSONString() : "";
         return _request("POST", "get_network_fee_estimate", argsJson);
     }
     public JSONObject ArchiveAddress(JSONObject args) throws Exception { 
-        String argsJson = args.toJSONString();
+        String argsJson = args != null ? args.toJSONString() : "";
         return _request("POST", "archive_address", argsJson);
     }
     public JSONObject UnarchiveAddress(JSONObject args) throws Exception { 
-        String argsJson = args.toJSONString();
+        String argsJson = args != null ? args.toJSONString() : "";
         return _request("POST", "unarchive_address", argsJson);
     }
     public JSONObject GetMyArchivedAddresses(JSONObject args) throws Exception { 
-        String argsJson = args.toJSONString();
+        String argsJson = args != null ? args.toJSONString() : "";
         return _request("POST", "get_my_archived_addresses", argsJson);
     }
     public JSONObject ArchiveDtrustAddress(JSONObject args) throws Exception { 
-        String argsJson = args.toJSONString();
+        String argsJson = args != null ? args.toJSONString() : "";
         return _request("POST", "archive_dtrust_address", argsJson);
     }
     public JSONObject UnarchiveDtrustAddress(JSONObject args) throws Exception { 
-        String argsJson = args.toJSONString();
+        String argsJson = args != null ? args.toJSONString() : "";
         return _request("POST", "unarchive_dtrust_address", argsJson);
     }
     public JSONObject GetMyArchivedDtrustAddresses(JSONObject args) throws Exception { 
-        String argsJson = args.toJSONString();
+        String argsJson = args != null ? args.toJSONString() : "";
         return _request("POST", "get_my_archived_dtrust_addresses", argsJson);
     }
     public JSONObject GetDtrustNetworkFeeEstimate(JSONObject args) throws Exception { 
-        String argsJson = args.toJSONString();
+        String argsJson = args != null ? args.toJSONString() : "";
         return _request("POST", "get_dtrust_network_fee_estimate", argsJson);
     }
     public JSONObject CreateNotification(JSONObject args) throws Exception { 
-        String argsJson = args.toJSONString();
+        String argsJson = args != null ? args.toJSONString() : "";
         return _request("POST", "create_notification", argsJson);
     }
     public JSONObject DisableNotification(JSONObject args) throws Exception { 
-        String argsJson = args.toJSONString();
+        String argsJson = args != null ? args.toJSONString() : "";
         return _request("POST", "disable_notification", argsJson);
     }
     public JSONObject EnableNotification(JSONObject args) throws Exception { 
-        String argsJson = args.toJSONString();
+        String argsJson = args != null ? args.toJSONString() : "";
         return _request("POST", "enable_notification", argsJson);
     }
     public JSONObject GetNotifications(JSONObject args) throws Exception { 
-        String argsJson = args.toJSONString();
+        String argsJson = args != null ? args.toJSONString() : "";
         return _request("POST", "get_notifications", argsJson);
     }
     public JSONObject GetRecentNotificationEvents(JSONObject args) throws Exception { 
-        String argsJson = args.toJSONString();
+        String argsJson = args != null ? args.toJSONString() : "";
         return _request("POST", "get_recent_notification_events", argsJson);
     }
     public JSONObject DeleteNotification(JSONObject args) throws Exception { 
-        String argsJson = args.toJSONString();
+        String argsJson = args != null ? args.toJSONString() : "";
         return _request("POST", "delete_notification", argsJson);
     }
     public JSONObject ValidateApiKey(JSONObject args) throws Exception { 
-        String argsJson = args.toJSONString();
+        String argsJson = args != null ? args.toJSONString() : "";
         return _request("POST", "validate_api_key", argsJson);
     }
     public JSONObject SignTransation(JSONObject args) throws Exception { 
-        String argsJson = args.toJSONString();
+        String argsJson = args != null ? args.toJSONString() : "";
         return _request("POST", "sign_transaction", argsJson);
     }
     public JSONObject FinalizeTransaction(JSONObject args) throws Exception { 
-        String argsJson = args.toJSONString();
+        String argsJson = args != null ? args.toJSONString() : "";
         return _request("POST", "finalize_transaction", argsJson);
     }
     public JSONObject GetMyAddressesWithoutBalances(JSONObject args) throws Exception { 
-        String argsJson = args.toJSONString();
+        String argsJson = args != null ? args.toJSONString() : "";
         return _request("POST", "get_my_addresses_without_balances", argsJson);
     }
     public JSONObject GetRawTransaction(JSONObject args) throws Exception { 
-        String argsJson = args.toJSONString();
+        String argsJson = args != null ? args.toJSONString() : "";
         return _request("POST", "get_raw_transaction", argsJson);
     }
     public JSONObject GetDtrustBalance(JSONObject args) throws Exception { 
-        String argsJson = args.toJSONString();
+        String argsJson = args != null ? args.toJSONString() : "";
         return _request("POST", "get_dtrust_balance", argsJson);
     }
     public JSONObject ArchiveAddresses(JSONObject args) throws Exception { 
-        String argsJson = args.toJSONString();
+        String argsJson = args != null ? args.toJSONString() : "";
         return _request("POST", "archive_addresses", argsJson);
     }
     public JSONObject UnarchiveAddresses(JSONObject args) throws Exception { 
-        String argsJson = args.toJSONString();
+        String argsJson = args != null ? args.toJSONString() : "";
         return _request("POST", "unarchive_addresses", argsJson);
     }
     public JSONObject ArchiveDtrustAddresses(JSONObject args) throws Exception { 
-        String argsJson = args.toJSONString();
+        String argsJson = args != null ? args.toJSONString() : "";
         return _request("POST", "archive_dtrust_addresses", argsJson);
     }
     public JSONObject UnarchiveDtrustAddresses(JSONObject args) throws Exception { 
-        String argsJson = args.toJSONString();
+        String argsJson = args != null ? args.toJSONString() : "";
         return _request("POST", "unarchive_dtrust_addresses", argsJson);
     }
     public JSONObject IsValidAddress(JSONObject args) throws Exception { 
-        String argsJson = args.toJSONString();
+        String argsJson = args != null ? args.toJSONString() : "";
         return _request("POST", "is_valid_address", argsJson);
     }
     public JSONObject GetCurrentPrice(JSONObject args) throws Exception { 
-        String argsJson = args.toJSONString();
+        String argsJson = args != null ? args.toJSONString() : "";
         return _request("POST", "get_current_price", argsJson);
     }
     public JSONObject GetAccountInfo(JSONObject args) throws Exception { 
-        String argsJson = args.toJSONString();
+        String argsJson = args != null ? args.toJSONString() : "";
         return _request("POST", "get_account_info", argsJson);
     }
     public JSONObject PrepareTransaction(JSONObject args) throws Exception {
-        String argsJson = args.toJSONString();
+        String argsJson = args != null ? args.toJSONString() : "";
         return _request("POST", "prepare_transaction", argsJson);
     }
     public JSONObject PrepareDtrustTransaction(JSONObject args) throws Exception {
-        String argsJson = args.toJSONString();
+        String argsJson = args != null ? args.toJSONString() : "";
         return _request("POST", "prepare_dtrust_transaction", argsJson);
     }
     public JSONObject SubmitTransaction(JSONObject args) throws Exception {
-        String argsJson = args.toJSONString();
+        String argsJson = args != null ? args.toJSONString() : "";
         return _request("POST", "submit_transaction", argsJson);
     }
 

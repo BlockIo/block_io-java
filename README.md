@@ -35,12 +35,11 @@ This Java library is the official reference client for the Block.io payments API
        }
     ```
 2. Add the following dependency:
-
-    ```
-        dependencies {
-		          implementation 'com.github.BlockIo:block_io-java:RELEASE_TAG_OR_COMMIT_HASH'
-	       }
-    ```
+   ```
+      dependencies {
+		    implementation 'com.github.BlockIo:block_io-java:RELEASE_TAG_OR_COMMIT_HASH'
+	  }
+   ```
 
 ## Usage
 
