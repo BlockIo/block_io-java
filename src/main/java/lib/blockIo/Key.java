@@ -1,4 +1,4 @@
-package lib;
+package lib.blockIo;
 
 import com.google.common.base.Strings;
 import org.bitcoinj.core.Base58;

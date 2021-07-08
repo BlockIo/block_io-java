@@ -1,5 +1,6 @@
 package lib;
 
+import lib.blockIo.BlockIo;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -135,21 +136,21 @@ class ClientMockTest {
     void Withdraw() throws Exception {
         String pin = "blockiotestpininsecure";
 
-        blockIo = new BlockIo(api_key, pin, 2, new Options("http://localhost:8080"));
-        Map<String, Object> response = blockIo.Withdraw(withdrawRequestBodyContent);
+        lib.blockIo = new BlockIo(api_key, pin, 2, new Options("http://localhost:8080"));
+        Map<String, Object> response = lib.blockIo.Withdraw(withdrawRequestBodyContent);
         assertNotNull(response.get("txid"));
     }
     @Test
     void Sweep() throws Exception {
-        blockIo = new BlockIo(api_key, null, 2, new Options("http://localhost:8080"));
-        Map<String, Object> response = blockIo.SweepFromAddress(sweepRequestBodyContent);
+        lib.blockIo = new BlockIo(api_key, null, 2, new Options("http://localhost:8080"));
+        Map<String, Object> response = lib.blockIo.SweepFromAddress(sweepRequestBodyContent);
         assertNotNull(response.get("txid"));
     }
     @Test
     void Dtrust() throws Exception {
         String pin = "blockiotestpininsecure";
-        blockIo = new BlockIo(api_key, pin, 2, new Options("http://localhost:8080"));
-        Map<String, Object> response = blockIo.WithdrawFromDtrustAddress(dTrustRequestBodyContent);
+        lib.blockIo = new BlockIo(api_key, pin, 2, new Options("http://localhost:8080"));
+        Map<String, Object> response = lib.blockIo.WithdrawFromDtrustAddress(dTrustRequestBodyContent);
         assertNotNull(response);
     }
 

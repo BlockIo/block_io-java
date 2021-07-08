@@ -1,5 +1,6 @@
 package lib;
 
+import lib.blockIo.Helper;
 import com.google.common.collect.ImmutableList;
 import org.bitcoinj.core.*;
 import org.bitcoinj.core.Transaction;

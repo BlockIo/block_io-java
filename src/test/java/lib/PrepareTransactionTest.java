@@ -1,5 +1,7 @@
 package lib;
 
+import lib.blockIo.BlockIo;
+import lib.blockIo.Key;
 import org.bitcoinj.core.ECKey;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;

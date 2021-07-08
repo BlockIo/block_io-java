@@ -1,4 +1,4 @@
-package lib;
+package lib.blockIo;
 
 public class Options {
     private String apiUrl;
