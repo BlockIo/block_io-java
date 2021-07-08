@@ -1,13 +1,12 @@
-package drust;
-
-import lib.*;
 import io.github.cdimascio.dotenv.Dotenv;
+import lib.BlockIo;
+import lib.Key;
 import org.bitcoinj.core.ECKey;
 import org.json.simple.JSONObject;
 
 import java.util.*;
 
-public class Main {
+public class dtrust {
 
     public static void main(String[] args) throws Exception {
 
@@ -92,7 +91,7 @@ public class Main {
         System.out.println("Summarized Prepared dTrust Transaction: " + blockIo.SummarizePreparedTransaction(res));
         // create and sign the transaction using just three keys (you can use all 4 keys to create the final transaction for broadcasting as well)
         res = blockIo.CreateAndSignTransaction(res, Arrays.copyOfRange(PrivKeys.stream().map(ECKey::getPrivateKeyAsHex).toArray(String[]::new), 0, 3));
-        
+
         // submit the transaction
         res = blockIo.SubmitTransaction(new JSONObject(Map.of("transaction_data", res)));
 

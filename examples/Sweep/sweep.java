@@ -1,30 +1,28 @@
-package sweeper;
-
 import lib.BlockIo;
 import io.github.cdimascio.dotenv.Dotenv;
 import org.json.simple.JSONObject;
-
-import java.io.UnsupportedEncodingException;
 import java.util.Map;
+import java.util.Objects;
 
-public class Main {
+public class sweep {
 
     public static void main(String[] args) throws Exception {
         final BlockIo blockIo;
         final Dotenv dotenv;
         dotenv = Dotenv.load();
         blockIo = new BlockIo(dotenv.get("API_KEY"));
-        if((dotenv.get("TO_ADDRESS").equals("") || dotenv.get("TO_ADDRESS") == null) ||
-                (dotenv.get("PRIVATE_KEY").equals("") || dotenv.get("PRIVATE_KEY") == null)){
+        if((Objects.equals(dotenv.get("TO_ADDRESS"), "") || dotenv.get("TO_ADDRESS") == null) ||
+                (Objects.equals(dotenv.get("PRIVATE_KEY"), "") || dotenv.get("PRIVATE_KEY") == null)){
 
             throw new Exception("Error: Missing parameters from env.");
         }
 
         // prepare the transaction
         JSONObject res = blockIo.PrepareSweepTransaction(new JSONObject(Map.of(
-                "to_address", dotenv.get("TO_ADDRESS"),
-                "private_key", dotenv.get("PRIVATE_KEY")
+                "to_address", Objects.requireNonNull(dotenv.get("TO_ADDRESS")),
+                "private_key", Objects.requireNonNull(dotenv.get("PRIVATE_KEY"))
         )));
+        System.out.println(res);
         // summarize the transaction
         // inspect it in-depth yourself to ensure everything as you expect
         System.out.println("Summarized Prepared Sweep Transaction: " + blockIo.SummarizePreparedTransaction(res));

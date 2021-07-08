@@ -1,12 +1,10 @@
-package basic;
-
 import lib.BlockIo;
 import io.github.cdimascio.dotenv.Dotenv;
 import org.json.simple.JSONObject;
 
 import java.util.Map;
 
-public class Main {
+public class basic {
     public static void main(String[] args) throws Exception {
         Dotenv dotenv = Dotenv.load();
         // initiate the BlockIo library with the API Key and Secret PIN
