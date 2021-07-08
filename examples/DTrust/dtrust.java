@@ -1,6 +1,6 @@
 import io.github.cdimascio.dotenv.Dotenv;
-import lib.BlockIo;
-import lib.Key;
+import lib.blockIo.BlockIo;
+import lib.blockIo.Key;
 import org.bitcoinj.core.ECKey;
 import org.json.simple.JSONObject;
 
