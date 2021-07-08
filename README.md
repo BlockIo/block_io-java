@@ -5,12 +5,48 @@ This Java library is the official reference client for the Block.io payments API
 
 ## Installation
 
-1. Clone the repo
-2. mvn package
+### Maven
+1. Add the following section to your pom.xml:
+   ```
+       <repositories>
+            <repository>
+                <id>jitpack.io</id>
+                <url>https://jitpack.io</url>
+            </repository>
+       </repositories>
+    ```
+2. Add the following dependency:
+
+    ```
+        <dependency>
+            <groupId>com.github.BlockIo</groupId>
+            <artifactId>block_io-java</artifactId>
+            <version>RELEASE_TAG_OR_COMMIT_HASH</version>
+        </dependency>
+    ```
+### Gradle
+1. Add the following in your root build.gradle at the end of repositories:
+   ```
+       allprojects {
+            repositories {
+                ...
+                maven { url 'https://jitpack.io' }
+            }
+       }
+    ```
+2. Add the following dependency:
+
+    ```
+        dependencies {
+		          implementation 'com.github.BlockIo:block_io-java:RELEASE_TAG_OR_COMMIT_HASH'
+	       }
+    ```
 
 ## Usage
 
 It's super easy to get started. In your code, do this:
+
+    import lib.blockIo.BlockIo;
 
     BlockIo blockLib = new BlockIo(API_KEY, PIN, VERSION);
 
@@ -24,7 +60,9 @@ It's super easy to get started. In your code, do this:
     // print all addresses on this account
     System.out.println(blockLib.GetMyAddresses(null));
 
-##### A note on passing json args to requests:
+For more detailed usage examples, take a look at the examples' folder in this repo
+
+### A note on passing json args to requests:
 
 Args are passed as a Map wrapped in a JSONObject like this: 
 
