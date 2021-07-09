@@ -329,8 +329,7 @@ public class BlockIo {
 
     private JSONObject _prepare_sweep_transaction(String method, String path, JSONObject args) throws Exception {
         // handle extraction of public key from given WIF private key, store the key for later use, and return the response for prepare_sweep_transaction
-        ECKey keyFromWif = null;
-        JSONObject res = null;
+        ECKey keyFromWif;
 
         if(args.get("private_key") == null){
             throw new Exception("Missing mandatory private_key argument.");
@@ -353,7 +352,7 @@ public class BlockIo {
                 .addHeader("User-Agent", UserAgent)
                 .url(constructUrl(path));
 
-        Request request = null;
+        Request request;
 
         if(method.equals("POST")){
             MediaType type = MediaType.get("application/json; charset=utf-8");
@@ -369,6 +368,7 @@ public class BlockIo {
         Response response = RestClient.newCall(request).execute();
         assert response.body() != null;
         String res = Objects.requireNonNull(response.body()).string();
+
         RestClient.dispatcher().executorService().shutdown();
         RestClient.connectionPool().evictAll();
 
