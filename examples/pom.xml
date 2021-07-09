@@ -94,7 +94,7 @@
         <dependency>
             <groupId>com.github.BlockIo</groupId>
             <artifactId>block_io-java</artifactId>
-            <version>714da83bb04b00bb68660f43e272abf397d0cfda</version>
+            <version>v2.0-beta</version>
         </dependency>
     </dependencies>
 
