@@ -348,53 +348,35 @@ public class BlockIo {
     }
 
     private JSONObject _request(String method, String path, String args) throws Exception {
-        JSONObject res = null;
+
+        Request.Builder builder = new Request.Builder()
+                .addHeader("User-Agent", UserAgent)
+                .url(constructUrl(path));
+
+        Request request = null;
 
         if(method.equals("POST")){
-            res = JsonUtils.parseJson(post(args, path));
+            MediaType type = MediaType.get("application/json; charset=utf-8");
+            RequestBody body = RequestBody.create(args, type);
+            request = builder
+                    .addHeader("Accept", "application/json")
+                    .post(body)
+                    .build();
         }
         else{
-            res = JsonUtils.parseJson(get(path));
+            request = builder.build();
         }
-        return res;
+        Response response = RestClient.newCall(request).execute();
+        assert response.body() != null;
+        String res = Objects.requireNonNull(response.body()).string();
+        RestClient.dispatcher().executorService().shutdown();
+        RestClient.connectionPool().evictAll();
+
+        return JsonUtils.parseJson(res);
     }
 
     private String constructUrl(String path){
         return ApiUrl + "/" + path + "?api_key=" + ApiKey;
-    }
-
-    private String get(String path) throws IOException {
-        Request request = new Request.Builder()
-                .addHeader("User-Agent", UserAgent)
-                .url(constructUrl(path))
-                .build();
-
-        Response response = RestClient.newCall(request).execute();
-        assert response.body() != null;
-        String res = response.body().string();
-        RestClient.dispatcher().executorService().shutdown();
-        RestClient.connectionPool().evictAll();
-
-        return res;
-    }
-
-    private String post(String json, String path) throws IOException {
-        MediaType type = MediaType.get("application/json; charset=utf-8");
-        RequestBody body = RequestBody.create(json, type);
-        Request request = new Request.Builder()
-                .url(constructUrl(path))
-                .addHeader("Accept", "application/json")
-                .addHeader("User-Agent", UserAgent)
-                .post(body)
-                .build();
-        Response response = RestClient.newCall(request).execute();
-        assert response.body() != null;
-        String res = response.body().string();
-        RestClient.dispatcher().executorService().shutdown();
-        RestClient.connectionPool().evictAll();
-
-        return res;
-            
     }
 
     /**
