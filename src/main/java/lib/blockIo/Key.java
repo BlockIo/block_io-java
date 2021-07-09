@@ -1,6 +1,5 @@
 package lib.blockIo;
 
-import com.google.common.base.Strings;
 import org.bitcoinj.core.Base58;
 import org.bitcoinj.core.ECKey;
 import org.bouncycastle.util.encoders.Hex;
@@ -84,7 +83,7 @@ public class Key extends ECKey {
     }
 
     public static ECKey fromHex(String privKeyHex) {
-        byte[] hexBytes = Hex.decode(Strings.padStart(privKeyHex, 64, '0'));
+        byte[] hexBytes = Hex.decode( String.format("%" + 64 + "s", privKeyHex).replace(' ', '0'));
         return ECKey.fromPrivate(hexBytes);
     }
 }

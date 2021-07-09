@@ -193,16 +193,16 @@ public class Helper {
 
         String pubKey = k.getPublicKeyAsHex();
         if(pubKey.equals(pubKeyToVerify)){
-            Sha256Hash hashedDataToSign = Sha256Hash.wrap(Utils.HEX.decode(dataToSign));
+            Sha256Hash hashedDataToSign = Sha256Hash.wrap(Hex.decode(dataToSign));
             ECKey.ECDSASignature sig = k.sign(hashedDataToSign);
             byte[] byteSignedData = sig.encodeToDER();
-            return Utils.HEX.encode(byteSignedData);
+            return Hex.toHexString(byteSignedData);
         }
         return null;
     }
 
     public static String txToHexString(Transaction tx){
-        return Utils.HEX.encode(tx.unsafeBitcoinSerialize());
+        return Hex.toHexString(tx.unsafeBitcoinSerialize());
     }
 
     public static Script createBlockIoP2WSHScript(Script redeem) throws IOException {

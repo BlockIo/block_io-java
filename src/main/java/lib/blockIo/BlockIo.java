@@ -221,7 +221,7 @@ public class BlockIo {
                     JSONObject sigObj = new JSONObject();
                     sigObj.put("input_index", inputIte);
                     sigObj.put("public_key", pubkeyStr);
-                    sigObj.put("signature", Utils.HEX.encode(txSig.encodeToDER()));
+                    sigObj.put("signature", Hex.toHexString(txSig.encodeToDER()));
                     signatures.add(sigObj);
                     curSigCount++;
                 }
