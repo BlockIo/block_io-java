@@ -40,6 +40,38 @@ This Java library is the official reference client for the Block.io payments API
 		    implementation 'com.github.BlockIo:block_io-java:2.0.0-beta'
 	  }
    ```
+### Android
+After adding the gradle dependency, you need to:
+1. Add this in your AndroidManifest:
+   
+   `<uses-permission android:name="android.permission.INTERNET"/>`
+   
+
+2. Add this in your build.gradle:
+
+   ```
+   android{
+      defaultConfig {
+         ...
+         multiDexEnabled true
+      }
+   
+      packagingOptions {
+        exclude 'lib/x86_64/darwin/libscrypt.dylib'
+        exclude 'lib/x86_64/freebsd/libscrypt.so'
+        exclude 'lib/x86_64/linux/libscrypt.so'
+      }
+   
+      dependencies {
+        implementation 'com.github.BlockIo:block_io-java:2.0.0-beta'
+        implementation 'com.android.support:multidex:1.0.3'
+        implementation 'com.squareup.okhttp3:okhttp:4.1.0'
+	  }
+   
+   } 
+   ```
+   
+See the sample Activity in examples/Android
 
 ## Usage
 
