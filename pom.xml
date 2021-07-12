@@ -6,7 +6,7 @@
 
     <groupId>io.block</groupId>
     <artifactId>block_io-java</artifactId>
-    <version>v2.0-beta</version>
+    <version>2.0.0-beta</version>
     <repositories>
         <repository>
             <id>jitpack.io</id>

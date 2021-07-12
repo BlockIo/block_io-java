@@ -21,7 +21,7 @@ This Java library is the official reference client for the Block.io payments API
         <dependency>
             <groupId>com.github.BlockIo</groupId>
             <artifactId>block_io-java</artifactId>
-            <version>RELEASE_TAG_OR_COMMIT_HASH</version>
+            <version>2.0.0-beta</version>
         </dependency>
     ```
 ### Gradle
@@ -37,7 +37,7 @@ This Java library is the official reference client for the Block.io payments API
 2. Add the following dependency:
    ```
       dependencies {
-		    implementation 'com.github.BlockIo:block_io-java:RELEASE_TAG_OR_COMMIT_HASH'
+		    implementation 'com.github.BlockIo:block_io-java:2.0.0-beta'
 	  }
    ```
 
