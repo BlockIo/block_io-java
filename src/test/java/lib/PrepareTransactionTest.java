@@ -47,6 +47,19 @@ public class PrepareTransactionTest {
     }
 
     @Test
+    void testWitnessV1() throws Exception {
+        JSONParser parser = new JSONParser();
+        JSONObject prepareTransactionResponse = (JSONObject) parser.parse(
+                new FileReader("src/test/resources/__files/json/prepare_transaction_response_witness_v1_output.json")
+        );;
+        JSONObject createAndSignTransactionResponse = (JSONObject) parser.parse(
+                new FileReader("src/test/resources/__files/json/create_and_sign_transaction_response_witness_v1_output.json")
+        );
+        JSONObject response = blockIo.CreateAndSignTransaction(prepareTransactionResponse);
+        assertEquals(response.toJSONString(), createAndSignTransactionResponse.toJSONString());
+    }
+
+    @Test
     void testSweepP2WPKH() throws Exception {
         JSONParser parser = new JSONParser();
         JSONObject prepareTransactionResponse = (JSONObject) parser.parse(
