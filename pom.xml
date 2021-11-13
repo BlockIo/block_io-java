@@ -92,9 +92,9 @@
             <version>4.1.0</version>
         </dependency>
         <dependency>
-            <groupId>com.github.dogecoin</groupId>
+            <groupId>com.github.nwasiq</groupId>
             <artifactId>libdohj</artifactId>
-            <version>7e68d7e19b6c28f231418d56fc2ee542e9e40ed5</version>
+            <version>2b00f250874c290cb0e060a9658aa9289387c252</version>
         </dependency>
         <dependency>
             <groupId>com.github.tomakehurst</groupId>
