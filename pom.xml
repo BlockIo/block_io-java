@@ -6,7 +6,7 @@
 
     <groupId>io.block</groupId>
     <artifactId>block_io-java</artifactId>
-    <version>2.0.1-beta</version>
+    <version>2.0.2-beta</version>
     <repositories>
         <repository>
             <id>jitpack.io</id>
@@ -92,9 +92,9 @@
             <version>4.1.0</version>
         </dependency>
         <dependency>
-            <groupId>com.github.nwasiq</groupId>
+            <groupId>com.github.dogecoin</groupId>
             <artifactId>libdohj</artifactId>
-            <version>2b00f250874c290cb0e060a9658aa9289387c252</version>
+            <version>0.16-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>com.github.tomakehurst</groupId>
@@ -110,7 +110,7 @@
         <dependency>
             <groupId>org.bitcoinj</groupId>
             <artifactId>bitcoinj-core</artifactId>
-            <version>0.16-beta1</version>
+            <version>0.16.1</version>
         </dependency>
     </dependencies>
 </project>
