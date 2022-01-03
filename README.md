@@ -21,7 +21,7 @@ This Java library is the official reference client for the Block.io payments API
         <dependency>
             <groupId>com.github.BlockIo</groupId>
             <artifactId>block_io-java</artifactId>
-            <version>2.0.0-beta</version>
+            <version>2.0.1-beta</version>
         </dependency>
     ```
 ### Gradle
@@ -37,7 +37,7 @@ This Java library is the official reference client for the Block.io payments API
 2. Add the following dependency:
    ```
       dependencies {
-		    implementation 'com.github.BlockIo:block_io-java:2.0.0-beta'
+		    implementation 'com.github.BlockIo:block_io-java:2.0.1-beta'
 	  }
    ```
 ### Android
@@ -63,7 +63,7 @@ After adding the gradle dependency, you need to:
       }
    
       dependencies {
-        implementation 'com.github.BlockIo:block_io-java:2.0.0-beta'
+        implementation 'com.github.BlockIo:block_io-java:2.0.1-beta'
         implementation 'com.android.support:multidex:1.0.3'
         implementation 'com.squareup.okhttp3:okhttp:4.1.0'
 	  }
